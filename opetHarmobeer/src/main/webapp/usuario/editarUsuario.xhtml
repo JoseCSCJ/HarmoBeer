@@ -1,0 +1,74 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+<h:head>
+	<title>Harmobeer - Cadastro de usuário</title>
+	<style type="text/css">
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.header {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.bottom {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	text-align: center;
+	vertical-align: middle;
+	color: #000000;
+}
+</style>
+</h:head>
+<body bgcolor="#DAA520">
+
+	<h:form>
+		<div>Altere as informações que deseja atualizar:</div>
+		<br />
+		<img
+			src="https://icon-icons.com/icons2/1130/PNG/512/useraddwithcircularbutton_80118.png"
+			width="200" height="200" />
+		<br />
+		<h:outputText value="Nome:">
+		</h:outputText>
+		<h:inputText id="nome" value="#{harmoBeerBean.username}" size="20"
+			required="true">
+		</h:inputText>
+		<br />
+		<br />
+		<h:outputText value="Email:">
+		</h:outputText>
+		<h:inputText id="email" value="#{harmoBeerBean.email}" size="50" required = "true">
+		</h:inputText>
+		<br />
+		<br />
+		<h:outputText value="Informacoes:">
+		</h:outputText>
+		<h:inputTextarea id="informacoes" value="#{harmoBeerBean.info}"
+			size="200" required="true" >
+		</h:inputTextarea>
+		<br />
+		<br />
+		<h:commandButton action="#{harmoBeerBean.editarUsuario()}"
+			value="Alterar Perfil" />
+		<br />
+	</h:form>
+	<h:form>
+		<h:commandButton value="Voltar para o menu principal"
+			action="#{harmoBeerBean.retornarMenuPrincipal()}" />
+	</h:form>
+
+</body>
+</html>

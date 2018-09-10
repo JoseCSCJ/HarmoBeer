@@ -1,0 +1,147 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+<h:head>
+	<title>Harmobeer - Selecionar Usuario</title>
+	<style type="text/css">
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.header {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.bottom {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	text-align: center;
+	vertical-align: middle;
+	color: #000000;
+}
+
+.order-table {
+	border-collapse: collapse;
+}
+
+.order-table-header {
+	text-align: center;
+	background: #E5E5E5;
+	border-bottom: 3px solid #BBBBBB;
+	padding: 16px;
+}
+
+.order-table-odd-row {
+	text-align: center;
+	background: #FFFFF0;
+	border-top: 2px solid #BBBBBB;
+	border-left: 1px solid #BBBBBB;
+	border-right: 1px solid #BBBBBB;
+}
+
+.order-table-even-row {
+	text-align: center;
+	background: #F9F9F9;
+	border-top: 2px solid #BBBBBB;
+	border-left: 1px solid #BBBBBB;
+	border-right: 1px solid #BBBBBB;
+}
+</style>
+</h:head>
+<body bgcolor="#DAA520">
+	<h:form>
+		<h:selectOneListbox id="avalselec"
+			value="#{harmoBeerBean.idAvalSelec}" required="true">
+			<f:selectItems value="#{harmoBeerBean.listaAval}">
+			</f:selectItems>
+		</h:selectOneListbox>
+		<br />
+		<h:commandButton value="Selecionar avaliacao"
+			action="#{harmoBeerBean.selecionarAvaliacao()}"></h:commandButton>
+		<br />
+		<br />
+	</h:form>
+	<h:form rendered="#{harmoBeerBean.avaliacaoSelecionada != null}">
+		<h:outputText
+			value="Nome da Cerveja: #{harmoBeerBean.avaliacaoSelecionada.getNm_cerv()}">
+		</h:outputText>
+
+		<br />
+		<h:outputText
+			value="Nome do Prato: #{harmoBeerBean.avaliacaoSelecionada.getNm_prato()}">
+		</h:outputText>
+
+		<br />
+		<h:outputText
+			value="Nota: #{harmoBeerBean.avaliacaoSelecionada.getNota()}">
+		</h:outputText>
+		<br />
+		<h:outputText
+			value="Comentario: #{harmoBeerBean.avaliacaoSelecionada.getComentario()}">
+		</h:outputText>
+	</h:form>
+	
+	<br />
+	<h:form rendered="#{harmoBeerBean.avaliacaoSelecionada != null}">
+		<h:commandButton value="Deletar avaliacao"
+			action="#{harmoBeerBean.deletarAvaliacao()}"></h:commandButton>
+		<br /></h:form>
+	<h:form rendered="#{harmoBeerBean.avaliacaoSelecionada != null}">
+		
+		<br />
+		<span style="font-size: 25px"><b>Deseja fazer alterações
+				nessa avaliacao?</b></span>
+		<br />
+		<h:outputText value="Qual nota deseja dar?" />
+		<br />
+		<br />
+		<h:selectOneRadio value="#{harmoBeerBean.nota}" required="true">
+			<h:outputText value=" 1 - Muito ruim " />
+			<h:outputText value=" 10 - Maravilhosa " />
+			<br />
+			<f:selectItem itemValue="1" itemLabel="1"></f:selectItem>
+			<f:selectItem itemValue="2" itemLabel="2"></f:selectItem>
+			<f:selectItem itemValue="3" itemLabel="3"></f:selectItem>
+			<f:selectItem itemValue="4" itemLabel="4"></f:selectItem>
+			<f:selectItem itemValue="5" itemLabel="5"></f:selectItem>
+			<f:selectItem itemValue="6" itemLabel="6"></f:selectItem>
+			<f:selectItem itemValue="7" itemLabel="7"></f:selectItem>
+			<f:selectItem itemValue="8" itemLabel="8"></f:selectItem>
+			<f:selectItem itemValue="9" itemLabel="9"></f:selectItem>
+			<f:selectItem itemValue="10" itemLabel="10"></f:selectItem>
+
+		</h:selectOneRadio>
+		<br />
+		<h:outputText value="Faça algum comentario sobre a sua experiência:" />
+		<h:inputText value="#{harmoBeerBean.comentario}" required="true"></h:inputText>
+		<h:outputText style="font-size:10px"
+			value="O comentário deve ter no máximo 140 caracteres" />
+		<br />
+		<h:commandButton value="Editar avaliacao"
+			action="#{harmoBeerBean.editarAvaliacao()}"></h:commandButton>
+
+	</h:form>
+	<br />
+	<br />
+
+	<h:form>
+		<h:commandButton value="Voltar para as suas avaliacoes"
+			action="#{harmoBeerBean.retornarSuasAval()}" />
+	</h:form>
+	<h:form>
+		<h:commandButton value="Voltar para o menu principal"
+			action="#{harmoBeerBean.retornarMenuPrincipal()}" />
+	</h:form>
+</body>
+</html>

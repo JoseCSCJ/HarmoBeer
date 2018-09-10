@@ -1,0 +1,57 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+<h:head>
+	<title>Harmobeer - Erro ao cadastrar!</title>
+	<style type="text/css">
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.header {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.bottom {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	text-align: center;
+	vertical-align: middle;
+	color: #000000;
+}
+</style>
+</h:head>
+<body>
+
+	<h:form>
+		<div>Ops! Parece que algo deu errado durante o cadastro do seu usuário!</div>
+		<br />
+		Username e a Senha devem ter no máximo 20 caracteres.
+		<br />
+		Email deve ter no máximo 50 caracteres.
+		<br />
+		Info deve ter no máximo 200 caracteres.
+		<br />
+		<img src="https://3.bp.blogspot.com/-bZk-cTgbfFk/Vd5Hf0Qne3I/AAAAAAAAPMo/PKmTpnbHYTIRay6sRpVNQ2BLzoLjokwSQCKgB/s1600/beer-bottle-emoji-collection-5-001.png" width="250" height="500"/>
+		<br />
+		
+	
+	</h:form>
+	<h:form>
+		<h:commandButton value="Voltar para o menu principal"
+			action="#{harmoBeerBean.retornarMenuPrincipal()}" />
+	</h:form>
+
+</body>
+</html>

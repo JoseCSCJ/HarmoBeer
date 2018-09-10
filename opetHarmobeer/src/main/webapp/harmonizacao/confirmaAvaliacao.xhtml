@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+<h:head>
+	<title>Harmobeer - Agradecimento</title>
+	<style type="text/css">
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.header {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.bottom {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	text-align: center;
+	vertical-align: middle;
+	color: #000000;
+}
+</style>
+</h:head>
+<body bgcolor="#DAA520">
+
+	<h:form>
+		<div>Muito obrigado pela sua avaliação!</div>
+		<br />
+
+		<br />
+		<img
+			src="https://cdn0.iconfinder.com/data/icons/beer-bottle-emoji-cartoons/418/beer-bottle-emoji-cartoon-alcohol-brew-008-256.png"
+			width="250" height="360" />
+		<br />
+		<h:commandButton action="#{harmoBeerBean.retornarMenuPrincipal()}"
+			value="Voltar para o menu principal" />
+		<h:commandButton action="#{harmoBeerBean.retornarHarmonizacao()}"
+			value="Voltar para a harmonizacao" />
+	</h:form>
+
+</body>
+</html>

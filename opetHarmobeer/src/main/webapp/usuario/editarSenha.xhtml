@@ -1,0 +1,78 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+<h:head>
+	<title>Harmobeer - Cadastro de usuário</title>
+	<style type="text/css">
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.header {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.bottom {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	text-align: center;
+	vertical-align: middle;
+	color: #000000;
+}
+</style>
+</h:head>
+<body bgcolor="#DAA520">
+
+	<h:form>
+		<div>Altere as informações que deseja atualizar:</div>
+		<br />
+		<img
+			src="https://icon-icons.com/icons2/1130/PNG/512/useraddwithcircularbutton_80118.png"
+			width="200" height="200" />
+		<br />
+		<h:outputText value="Confirme a senha antiga:">
+		</h:outputText>
+		<h:inputSecret id="senhaant" value="#{harmoBeerBean.senhaant}"
+			size="20" required="true">
+		</h:inputSecret>
+		
+		<br />
+		<br />
+		<h:outputText value="Nova Senha:">
+		</h:outputText>
+		<h:inputSecret id="senha" value="#{harmoBeerBean.senha}" size="20"
+			required="true">
+		</h:inputSecret><h:outputText style="font-size:10px"
+			value="A senha deve ter entre 1 e 20 caracteres" />
+		<br />
+		<h:outputText value="Confirme a nova senha:">
+		</h:outputText>
+		<h:inputSecret id="senhaconf" value="#{harmoBeerBean.senhaconf}"
+			size="20" required="true">
+		</h:inputSecret>
+		<br />
+		<br />
+		
+		
+		<h:commandButton action="#{harmoBeerBean.alterarSenha()}"
+			value="Alterar Senha" />
+		<br />
+	</h:form>
+	<h:form>
+		<h:commandButton value="Voltar para o menu principal"
+			action="#{harmoBeerBean.retornarMenuPrincipal()}" />
+	</h:form>
+
+</body>
+</html>

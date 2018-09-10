@@ -1,0 +1,196 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+<h:head>
+	<title>Harmobeer - Administrar Cervejas</title>
+	<style type="text/css">
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.header {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 10px;
+}
+
+.title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.column {
+	float: left;
+}
+
+.left {
+	width: 65%;
+}
+
+.right {
+	width: 35%;
+}
+
+.row:after {
+	content: "";
+	display: table;
+	clear: both;
+}
+
+.bottom {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	text-align: center;
+	vertical-align: middle;
+	color: #000000;
+}
+
+.order-table {
+	border-collapse: collapse;
+}
+
+.order-table-header {
+	text-align: center;
+	background: #E5E5E5;
+	border-bottom: 2px solid #BBBBBB;
+	padding: 14px;
+	font-size: 12px;
+}
+
+.order-table-odd-row {
+	text-align: center;
+	background: #FFFFF0;
+	border-top: 2px solid #BBBBBB;
+	border-left: 1px solid #BBBBBB;
+	border-right: 1px solid #BBBBBB;
+	font-size: 10px;
+}
+
+.order-table-even-row {
+	text-align: center;
+	background: #F9F9F9;
+	border-top: 2px solid #BBBBBB;
+	border-left: 2px solid #BBBBBB;
+	border-right: 2px solid #BBBBBB;
+	font-size: 10px;
+}
+</style>
+</h:head>
+<body bgcolor="#DAA520">
+	<div class="row">
+		<div class="column left">
+			<h:form>
+				<h:outputText style="font-size:21px"
+					rendered="#{harmoBeerBean.renderizar==true}"
+					value="~*~ Cerveja #{harmoBeerBean.nomeAdmin} foi " />
+				<h:outputText style="font-size:21px"
+					rendered="#{harmoBeerBean.editado==true}" value="editada ~*~" />
+				<h:outputText style="font-size:21px"
+					rendered="#{harmoBeerBean.deletado==true}" value="deletado ~*~" />
+				<h:outputText style="font-size:21px"
+					rendered="#{harmoBeerBean.cadastrado==true}" value="cadastrada ~*~" />
+				<br />
+				<span class="title"><h:outputText
+						value="Administrador #{harmoBeerBean.username}: Cervejas" /></span>
+				<br />
+				<br />
+				<h:outputText value="O que deseja buscar?"></h:outputText>
+				<br />
+
+				<h:outputText style="font-size: 10px"
+					value="Para fazer uma busca em toda a base de dados, deixe o campo em branco. "></h:outputText>
+				<br /><h:outputText style="font-size: 10px"
+					value="Caso nao haja nenhum correspondente, o sistema trara a lista completa "></h:outputText>
+
+				<h:inputText id="buscar" value="#{harmoBeerBean.buscar}" size="60"></h:inputText>
+				<h:commandButton action="#{harmoBeerBean.adminBuscarCerv()}"
+					value="Buscar Cerveja" />
+				<br />
+				<h:dataTable value="#{harmoBeerBean.adminListaCerv}" var="cerveja"
+					styleClass="order-table" headerClass="order-table-header"
+					rowClasses="order-table-odd-row,order-table-even-row">
+					<br />
+					<h:column>
+						<f:facet name="header">Nome da cerveja</f:facet>    				
+      #{cerveja.nm_cerv}
+   </h:column>
+
+					<h:column>
+						<f:facet name="header">Estilo</f:facet>
+      #{cerveja.nm_estilo}
+   </h:column>
+					<h:column>
+						<f:facet name="header">Teor Alcoolico</f:facet>
+      #{cerveja.teor_alcool}
+   </h:column>
+
+					<h:column>
+						<h:commandButton value="Selecionar"
+							action="#{harmoBeerBean.adminSelecionarCerv(cerveja.id_cerv)}" />
+					</h:column>
+					<h:column>
+						<h:commandButton value="Deletar"
+							action="#{harmoBeerBean.adminDeletarCerv(cerveja.id_cerv)}" />
+					</h:column>
+
+
+				</h:dataTable>
+			</h:form>
+		</div>
+		<div class="column right">
+			<h:form>
+
+				<h:outputText style="font-size:18px"
+					value="Administração da Cerveja" />
+				<br />
+				<h:outputText style="font-size:10px"
+					value="Nesse espaço você fará a edição e cadastro de novas cervejas. Para editar é necessário selecionar a cerveja na tabela ao lado." />
+				<br />
+				<h:outputText style="font-size:10px"
+					value="	Todos os campos são obrigatórios" />
+				<br />
+
+				<h:outputText style="font-size:13px" value="Nome da Cerveja: " />
+				<br />
+				<h:inputText value="#{harmoBeerBean.nm_cerv}" size="60" />
+				<br />
+				<h:outputText style="font-size:10px"
+					value="O nome da cerveja não pode ser maior que 60 caracteres" />
+				<br />
+				<h:outputText style="font-size:13px" value="Estilo da Cerveja: " />
+				<br />
+				<h:inputText value="#{harmoBeerBean.estilo_cerv}" size="60" />
+				<br />
+				<h:outputText style="font-size:10px"
+					value="O estilo da cerveja não pode ser maior que 60 caracteres" />
+				<br />
+				<h:outputText style="font-size:13px" value="Teor Alcoolico: " />
+				<br />
+				<h:inputText value="#{harmoBeerBean.teor_alcoolico}" />
+				<br />
+				<h:outputText style="font-size:10px"
+					value="O teor alcoolico não pode ser maior que 70%" />
+				<br />
+				<h:commandButton rendered="#{harmoBeerBean.selecionado == true}"
+					value="Editar" action="#{harmoBeerBean.adminEditarCerv()}" />
+				<h:commandButton rendered="#{harmoBeerBean.selecionado == false}"
+					value="Cadastrar NOVA cerveja"
+					action="#{harmoBeerBean.adminCadastrarCerv()}" />
+				<h:commandButton rendered="#{harmoBeerBean.selecionado == true}"
+					value="Voltar para o cadastro"
+					action="#{harmoBeerBean.adminBuscarCerv()}" />
+
+
+			</h:form>
+		</div>
+	</div>
+	<h:form>
+		<h:commandButton align="center" value="Voltar para o menu principal"
+			action="#{harmoBeerBean.retornarMenuPrincipal()}" />
+	</h:form>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:f="http://java.sun.com/jsf/core"
+	xmlns:h="http://java.sun.com/jsf/html">
+
+<h:head>
+	<title>Harmobeer - Erro!</title>
+	<style type="text/css">
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.header {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.bottom {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	text-align: center;
+	vertical-align: middle;
+	color: #000000;
+}
+</style>
+</h:head>
+<body>
+
+	<h:form>
+		<div>Ops! Parece que algo deu errado!</div>
+		<br />
+		Revise os dados inseridos ou aguarde um tempo antes de tentar novamente!
+		<br />
+		<img
+			src="https://vectortoons.com/wp-content/uploads/2014/10/bottle-of-beer-crying-out-loud-emoji-102714.jpg"
+			width="300" height="400" />
+		<br />
+		<h:commandButton rendered="#{harmoBeerBean.usuarioLogado != null}"
+			action="#{harmoBeerBean.retornarMenuPrincipal()}" value="Voltar para o menu principal" />
+		<h:commandButton action="/index" value="Voltar para a página de login" />
+		
+	</h:form>
+
+</body>
+</html>
