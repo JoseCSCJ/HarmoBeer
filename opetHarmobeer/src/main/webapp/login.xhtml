@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<title>Harmobeer - Login</title>
+	<style type="text/css">
+body {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.header {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+}
+
+.title {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-weight: bold;
+	font-size: 20px;
+}
+
+.bottom {
+	font-family: Verdana, Arial, Helvetica, sans-serif;
+	font-size: 20px;
+	text-align: center;
+	vertical-align: middle;
+	color: #000000;
+}
+</style>
+</h:head>
+<body bgcolor="#DAA520">
+	<div align="center">
+	
+		<h:form id="form">
+		<p:messages id="valNull"/>
+			<div>
+				<p:outputLabel value="Bem-vindo ao Harmobeer!"></p:outputLabel>
+				<br></br>
+				<p:outputLabel value="O seu site de harmonização de
+			cervejas"></p:outputLabel>
+			</div>
+
+			<div>
+				<img
+					src="http://images.clipartlogo.com/files/images/16/160193/beer-mug_t" />
+				<img
+					src="http://icons.iconarchive.com/icons/aha-soft/desktop-buffet/256/Pizza-icon.png" />
+			</div>
+			<br />
+			<p:panelGrid id="grid" columns="2">
+
+				<h:outputText value="Login: "></h:outputText>
+				<h:inputText id="login" value="#{harmoBeerBean.username}" size="20"
+					 />
+
+				<h:outputText value="Senha: "></h:outputText>
+				<h:inputSecret id="senha" value="#{harmoBeerBean.senha}" size="20"
+					 />
+				
+				
+			</p:panelGrid>
+			
+			
+			
+			<br />
+
+			<br />
+
+			<p:commandButton value="Entrar" id="entrar"
+				action="#{harmoBeerBean.entrar()}" update="form"  />
+		</h:form>
+
+
+		<h:form>
+			<h:link outcome="/usuario/cadastroUsuario"
+				value="Ainda não é membro? Cadastre-se aqui!" />
+		</h:form>
+	</div>
+</body>
+</html>

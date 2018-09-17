@@ -98,6 +98,7 @@ public class Usuario {
 		this.id_user = id_user;
 
 	}
+	
 
 	/**
 	 * @return the id_user

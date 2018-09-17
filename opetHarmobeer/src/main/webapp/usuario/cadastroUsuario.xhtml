@@ -2,7 +2,8 @@
                       "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:f="http://java.sun.com/jsf/core"
-	xmlns:h="http://java.sun.com/jsf/html">
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:p="http://primefaces.org/ui">
 
 <h:head>
 	<title>Harmobeer - Cadastro de usuário</title>
@@ -34,58 +35,66 @@ body {
 </h:head>
 <body bgcolor="#DAA520">
 
-	<h:form>
+	<h:form id="form">
 		<div>Insira suas informações para se cadastrar:</div>
 		<br />
-		<img
-			src="https://icon-icons.com/icons2/1130/PNG/512/useraddwithcircularbutton_80118.png"
-			width="200" height="200" />
-		<br />
-		<h:outputText value="Nome:">
-		</h:outputText>
-		<h:inputText id="nome" value="#{harmoBeerBean.username}" size="20"
-			required="true">
-		</h:inputText><h:outputText style="font-size:10px"
-			value="O username deve ter no máximo 20 caracteres" />
-		<br />
-		<br />
-		<h:outputText value="Email:">
-		</h:outputText>
-		<h:inputText id="email" value="#{harmoBeerBean.email}" size="50"
-			required="true"><h:outputText style="font-size:10px"
-			value="O email pode ter no máximo 50 caracteres" />
-		</h:inputText>
-		<br />
-		<br />
-		<h:outputText value="Senha:">
-		</h:outputText>
-		<h:inputSecret id="senha" value="#{harmoBeerBean.senha}" size="20"
-			required="true">
-		</h:inputSecret><h:outputText style="font-size:10px"
-			value="A senha deve ter entre 1 e 20 caracteres" />
-		<br />
-		<h:outputText value="Confirme a senha:">
-		</h:outputText>
-		<h:inputSecret id="senhaconf" value="#{harmoBeerBean.senhaconf}"
-			size="20" required="true">
+		<p:panelGrid align="center" columns="3">
+			<f:facet name="header">
+				<img
+					src="https://icon-icons.com/icons2/1130/PNG/512/useraddwithcircularbutton_80118.png"
+					width="200" height="200" />
+			</f:facet>
 
-		</h:inputSecret>
+			<h:outputText value="Nome:">
+			</h:outputText>
+			<h:inputText id="nome" value="#{harmoBeerBean.username}" size="20">
+			</h:inputText>
+			<h:outputText style="font-size:10px"
+				value="O username deve ter no máximo 20 caracteres" />
+
+
+			<h:outputText value="Email:">
+			</h:outputText>
+			<h:inputText id="email" value="#{harmoBeerBean.email}" size="50">
+
+			</h:inputText>
+			<h:outputText style="font-size:10px"
+				value="O email pode ter no máximo 50 caracteres" />
+
+			<h:outputText value="Senha:">
+			</h:outputText>
+			<h:inputSecret id="senha" value="#{harmoBeerBean.senha}" size="20">
+			</h:inputSecret>
+			<h:outputText style="font-size:10px"
+				value="A senha deve ter entre 1 e 20 caracteres" />
+
+			<h:outputText value="Confirme a senha:">
+			</h:outputText>
+			<h:inputSecret id="senhaconf" value="#{harmoBeerBean.senhaconf}"
+				size="20"></h:inputSecret>
+			<h:outputText style="font-size:10px"
+				value="A senha deve ter entre 1 e 20 caracteres" />
+
+
+			<h:outputText value="Nos conte um pouco sobre você:">
+			</h:outputText>
+			<p:inputTextarea id="informacoes" value="#{harmoBeerBean.info}"
+				size="200">
+			</p:inputTextarea>
+			<h:outputText style="font-size:10px"
+				value="Essas informações podem ter até no máximo 200 caracteres" />
+		</p:panelGrid>
 		<br />
 		<br />
-		<h:outputText value="Nos diga um pouco sobre você:">
-		</h:outputText>
-		<h:inputTextarea id="informacoes" value="#{harmoBeerBean.info}"
-			size="200" required="true">
-		</h:inputTextarea><h:outputText style="font-size:10px"
-			value="Essas informações podem ter até no máximo 200 caracteres" />
-		<br />
-		<br />
-		<h:commandButton action="#{harmoBeerBean.cadastrarUsuario()}"
-			value="Cadastrar" />
+		<p:messages />
+		
+		
+		<p:commandButton action="#{harmoBeerBean.cadastrarUsuario()}"
+			value="Cadastrar" update="form" />
 		<br />
 	</h:form>
 	<h:form>
-		<h:commandButton action="/index" value="Voltar" />
+		<h:commandButton action="/login" value="Voltar" />
 	</h:form>
 
 </body>

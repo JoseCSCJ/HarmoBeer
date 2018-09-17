@@ -17,6 +17,10 @@
 			<name>Prime Repo</name>
 			<url>http://repository.primefaces.org</url>
 		</repository>
+		<repository>
+			<id>codelds</id>
+			<url>https://code.lds.org/nexus/content/groups/main-repo</url>
+		</repository>
 	</repositories>
 	<dependencies>
 		<dependency>
