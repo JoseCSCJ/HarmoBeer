@@ -1,6 +1,6 @@
 package com.harmobeer.util;
 
-import java.util.Properties;
+//import java.util.Properties;
 
 //xmlns:p="http://primefaces.org/ui" - Primefaces para colocar no html da página ou no ui:decorate do template
 
@@ -35,14 +35,14 @@ import java.util.Properties;
  */
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
-import javax.mail.Address;
+/**import javax.mail.Address;
 import javax.mail.Message;
 import javax.mail.MessagingException;
 import javax.mail.PasswordAuthentication;
 import javax.mail.Session;
 import javax.mail.Transport;
 import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
+import javax.mail.internet.MimeMessage;*/
 
 /**
  * Classe responsavel pelas utilidades do Sistema HarmoBeer
@@ -114,7 +114,7 @@ public class Util {
 		facesContext.addMessage(clientID, new FacesMessage(FacesMessage.SEVERITY_WARN, mensagem, ""));
 	}
 
-	/**
+	/*
 	 * Método extra caso queira enviar um email simples :D
 	 * 
 	 * @param oferta

@@ -39,7 +39,7 @@ body {
 	<div align="center">
 	
 		<h:form id="form">
-		<p:messages id="valNull"/>
+		
 			<div>
 				<p:outputLabel value="Bem-vindo ao Harmobeer!"></p:outputLabel>
 				<br></br>
@@ -56,16 +56,15 @@ body {
 			<br />
 			<p:panelGrid id="grid" columns="2">
 
-				<h:outputText value="Login: "></h:outputText>
-				<h:inputText id="login" value="#{harmoBeerBean.username}" size="20"
-					 />
+				<p:outputLabel for="login" value="Login: "></p:outputLabel>
+				<p:password id="login" value="#{harmoBeerBean.username}" size="20"/>
 
-				<h:outputText value="Senha: "></h:outputText>
-				<h:inputSecret id="senha" value="#{harmoBeerBean.senha}" size="20"
-					 />
+				<p:outputLabel for="senha" value="Senha: "></p:outputLabel>
+				<p:password id="senha" value="#{harmoBeerBean.senha}" size="20"/>
 				
 				
 			</p:panelGrid>
+			<p:messages closable="true"/>
 			
 			
 			

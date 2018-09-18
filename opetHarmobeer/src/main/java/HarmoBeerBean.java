@@ -130,6 +130,7 @@ public class HarmoBeerBean implements Serializable {
 	public String entrar() {
 
 		// Atualizar as harmonizacoes ao logar no sistema
+		try {
 		ArrayList<Harmonizacao> h = new ArrayList<Harmonizacao>();
 		h = harmonizacaoController.listarTodos();
 		for (Harmonizacao ha : h) {
@@ -150,6 +151,13 @@ public class HarmoBeerBean implements Serializable {
 
 			return "";
 		}
+		}catch(Exception e) {
+			FacesContext f = FacesContext.getCurrentInstance();
+			f.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, "Erro interno", "Contacte o Admin"));
+			e.printStackTrace();
+			return "";
+		}
+	
 
 	}
 
@@ -160,27 +168,27 @@ public class HarmoBeerBean implements Serializable {
 	 */
 	public String cadastrarUsuario() {
 		try {
-		if (senha.compareTo(senhaconf) == 0) {
-			usuarioCadastrado = new Usuario(getUsername(), getEmail(), getSenha(), getInfo());
-			if (usuarioController.incluir(usuarioCadastrado)) {
-				zerarUsuario();
-				return "/harmobeer/confirmaCadastro";
+			if (senha.compareTo(senhaconf) == 0) {
+				usuarioCadastrado = new Usuario(getUsername(), getEmail(), getSenha(), getInfo());
+				if (usuarioController.incluir(usuarioCadastrado)) {
+					zerarUsuario();
+					return "/harmobeer/confirmaCadastro";
+				} else {
+					zerarUsuario();
+					Util.mensagemErro("form:cadastro",
+							"Todos os dados devem ser preenchidos e dentro das especificações");
+					return "";
+				}
 			} else {
 				zerarUsuario();
-				Util.mensagemErro("form:cadastro","Todos os dados devem ser preenchidos e dentro das especificações");
+				Util.mensagemErro("form:senha", "Para prosseguir, a confirmação de senha deve ser igual à senha");
 				return "";
 			}
-			} else {
-			zerarUsuario();
-			Util.mensagemErro("form:senha","Para prosseguir, a confirmação de senha deve ser igual à senha");
-			return "";
-			}
-		}catch (Exception e) {
+		} catch (Exception e) {
 			Util.mensagemErro("Todos os dados devem ser preenchidos");
 			e.printStackTrace();
 			return "";
 		}
-		
 
 	}
 
