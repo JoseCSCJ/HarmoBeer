@@ -6,7 +6,7 @@
 	<display-name>harmobeer</display-name>
 	<context-param>
 		<param-name>javax.faces.PROJECT_STAGE</param-name>
-		<param-value>Development</param-value>
+		<param-value>Production</param-value>
 	</context-param>
 	<context-param>
 		<param-name>javax.faces.INTERPRET_EMPTY_STRING_SUBMITTED_VALUES_AS_NULL</param-name>
@@ -20,7 +20,6 @@
 		<welcome-file>index.jsp</welcome-file>
 	</welcome-file-list>
 	<error-page>
-		<error-code>404</error-code>
 		<location>/harmobeer/errorpage.xhtml</location>
 	</error-page>
 	<servlet>

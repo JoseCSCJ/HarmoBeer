@@ -32,8 +32,9 @@ public class AvaliacaoController {
 	 * @param user
 	 * @param harmo
 	 * @return boolean
+	 * @throws Exception 
 	 */
-	public boolean incluirAvaliacao(Avaliacao aval, Usuario user, Harmonizacao harmo) {
+	public boolean incluirAvaliacao(Avaliacao aval, Usuario user, Harmonizacao harmo) throws Exception {
 		if (validarAvaliacao(aval)) {
 			return avaliacaoModel.incluirAvaliacao(aval, user, harmo);
 		} else {
@@ -46,8 +47,9 @@ public class AvaliacaoController {
 	 * 
 	 * @param aval
 	 * @return boolean
+	 * @throws Exception 
 	 */
-	public boolean editarAvaliacao(Avaliacao aval) {
+	public boolean editarAvaliacao(Avaliacao aval) throws Exception {
 		if (validarAvaliacao(aval)) {
 			return avaliacaoModel.editarAvaliacao(aval);
 		} else {
@@ -95,6 +97,15 @@ public class AvaliacaoController {
 		public Avaliacao selecionarAval(int id) {
 			return avaliacaoModel.selecionarAval(id);
 		}
+		/**
+		 * Metodo responsavel por buscar e retornar o último objeto gerado da classe Avaliacao no
+		 * banco
+		 *
+		 * @return int id Ultima Avaliacao criada
+		 */
+		public int selecionarUltAval() {
+			return avaliacaoModel.selecionarUltAval();
+		}
 
 	/**
 	 * Método para validar se uma avaliação é válida para entrar no banco de
@@ -102,23 +113,27 @@ public class AvaliacaoController {
 	 * 
 	 * @param aval
 	 * @return
+	 * @throws Exception 
 	 */
-	private boolean validarAvaliacao(Avaliacao aval) {
+	private boolean validarAvaliacao(Avaliacao aval) throws Exception {
 
 		int nota = aval.getNota();
 		String comentario = aval.getComentario();
 
 		if (comentario.length() > 140) {
 			System.out.println("Comentario muito longo");
-			return false;
+			throw new Exception();
+			
 		}
 
 		if (nota > 10 || nota < 1) {
 			System.out.println("Nota Inválida");
-			return false;
+			throw new Exception();			
 		}
 
 		return true;
 
 	}
+	
+
 }

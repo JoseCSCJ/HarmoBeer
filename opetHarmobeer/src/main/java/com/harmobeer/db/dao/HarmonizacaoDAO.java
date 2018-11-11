@@ -129,7 +129,7 @@ public class HarmonizacaoDAO {
 				return true;
 			} else if (verificarHarmo == -2) {
 				// Erro de banco
-				System.out.println("Harmonizacao nao incluida por ter dado erro no banco");
+				System.out.println("Harmonizacao nao incluida por inconsistência com o banco");
 				return false;
 			} else {
 				// Harmonizacao ja existe, nao incluir nada
@@ -250,16 +250,23 @@ public class HarmonizacaoDAO {
 
 			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
 
-			sttm = connection.prepareStatement("select * from harmonizacao where id_cerv = ? order by media desc");
+			sttm = connection.prepareStatement("select p.id_prato, p.nm_prato, c.nm_cerv, h.id_harmo, h.media"
+					+ " from harmonizacao h left join prato p on p.id_prato = h.id_prato"
+					+ " left join cerveja c on c.id_cerv = h.id_cerv"
+					+ " where c.id_cerv=?"
+					+ " order by media desc");
 			sttm.setInt(1, cerveja.getId_cerv());
 			ResultSet rs = sttm.executeQuery();
 
 			while (rs.next()) {
 
 				int id_harmo = rs.getInt("id_harmo");
-				int id_prato = rs.getInt("id_prato");
+				int id_prato = rs.getInt("id_prato");				
+				String pNm_cerv = rs.getString("nm_cerv");
+				String pNm_prato = rs.getString("nm_prato");
 				Double media = rs.getDouble("media");
-				Harmonizacao harmo = new Harmonizacao(id_harmo, cerveja.getId_cerv(), id_prato, media);
+
+				Harmonizacao harmo = new Harmonizacao(id_harmo, cerveja.getId_cerv(), pNm_cerv, id_prato, pNm_prato, media);
 
 				listaHarmo.add(harmo);
 			}
@@ -306,7 +313,11 @@ public class HarmonizacaoDAO {
 
 			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
 
-			sttm = connection.prepareStatement("select * from harmonizacao where id_prato = ? order by media desc");
+			sttm = connection.prepareStatement("select p.nm_prato, c.id_cerv, c.nm_cerv, h.id_harmo, h.media"
+					+ " from harmonizacao h left join prato p on p.id_prato = h.id_prato "
+					+ " left join cerveja c on c.id_cerv = h.id_cerv"
+					+ " where p.id_prato = ?"
+					+ " order by media desc");
 			sttm.setInt(1, prato.getId_prato());
 			ResultSet rs = sttm.executeQuery();
 
@@ -314,9 +325,11 @@ public class HarmonizacaoDAO {
 
 				int id_harmo = rs.getInt("id_harmo");
 				int id_cerv = rs.getInt("id_cerv");
+				String pNm_cerv = rs.getString("nm_cerv");
+				String pNm_prato = rs.getString("nm_prato");
 				Double media = rs.getDouble("media");
 
-				Harmonizacao harmo = new Harmonizacao(id_harmo, id_cerv, prato.getId_prato(), media);
+				Harmonizacao harmo = new Harmonizacao(id_harmo, id_cerv, pNm_cerv, prato.getId_prato(), pNm_prato, media);
 
 				listaHarmo.add(harmo);
 			}
@@ -366,7 +379,8 @@ public class HarmonizacaoDAO {
 			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
 
 			sttm = connection.prepareStatement("select p.id_prato, c.id_cerv, h.id_harmo from harmonizacao h "
-					+ "left join prato p on p.id_prato = h.id_prato " + "left join cerveja c on c.id_cerv = h.id_cerv");
+					+ "left join prato p on p.id_prato = h.id_prato "
+					+ "left join cerveja c on c.id_cerv = h.id_cerv");
 			rs = sttm.executeQuery();
 			while (rs.next()) {
 				verificarPrato = false;
@@ -482,7 +496,10 @@ public class HarmonizacaoDAO {
 
 			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
 
-			sttm = connection.prepareStatement("select * from harmonizacao");
+			sttm = connection.prepareStatement("select p.id_prato, p.nm_prato, c.id_cerv, c.nm_cerv, h.id_harmo, h.media"
+					+ " from harmonizacao h left join prato p on p.id_prato = h.id_prato"
+					+ " left join cerveja c on c.id_cerv = h.id_cerv"
+					+ " order by media desc");
 			ResultSet rs = sttm.executeQuery();
 
 			while (rs.next()) {
@@ -490,9 +507,11 @@ public class HarmonizacaoDAO {
 				int id_harmo = rs.getInt("id_harmo");
 				int id_prato = rs.getInt("id_prato");
 				int id_cerv = rs.getInt("id_cerv");
+				String pNm_cerv = rs.getString("nm_cerv");
+				String pNm_prato = rs.getString("nm_prato");
 				Double media = rs.getDouble("media");
 
-				Harmonizacao harmo = new Harmonizacao(id_harmo, id_cerv, id_prato, media);
+				Harmonizacao harmo = new Harmonizacao(id_harmo, id_cerv, pNm_cerv, id_prato, pNm_prato, media);
 
 				listaHarmo.add(harmo);
 			}

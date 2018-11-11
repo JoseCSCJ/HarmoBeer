@@ -332,5 +332,51 @@ public class AvaliacaoDAO {
 			}
 		}
 	}
+	/**
+	 * Metodo responsavel por buscar e retornar o último objeto gerado da classe Avaliacao no
+	 * banco
+	 *
+	 * @return int id Ultima Avaliacao criada
+	 */
+	public int selecionarUltAval() {
+		int id = 0;
+		Connection connection = null;
+		PreparedStatement sttm = null;
+		try {
+			Class.forName(JDBC_DRIVER);
+
+			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
+
+			sttm = connection.prepareStatement("select MAX(id_aval) from avaliacao");
+			
+			ResultSet rs = sttm.executeQuery();
+
+			while (rs.next()) {
+				
+				id = rs.getInt(1);				
+
+			}
+			return id;
+		} catch (ClassNotFoundException e) {
+			System.out.println(ERRO);
+			e.printStackTrace();
+			return id;
+		} catch (SQLException Except) {
+			System.out.println(ERRO);
+			Except.printStackTrace();
+			return id;
+		} finally {
+			try {
+				if (connection != null) {
+					connection.close();
+				}
+				if (sttm != null) {
+					sttm.close();
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 
 }

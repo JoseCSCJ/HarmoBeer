@@ -83,5 +83,14 @@ public class AvaliacaoModel {
 		public Avaliacao selecionarAval(int id) {
 			return avaliacaoDAO.selecionarAval(id);
 		}
+		/**
+		 * Metodo responsavel por buscar e retornar o último objeto gerado da classe Avaliacao no
+		 * banco
+		 *
+		 * @return int id Ultima Avaliacao criada
+		 */
+		public int selecionarUltAval() {
+			return avaliacaoDAO.selecionarUltAval();
+		}
 
 }

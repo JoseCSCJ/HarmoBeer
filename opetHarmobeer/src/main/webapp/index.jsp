@@ -20,7 +20,7 @@ pageEncoding="ISO-8859-1"%>
 
 <%
 
-response.sendRedirect("login.jsf");
+response.sendRedirect("inicial.jsf");
 
 %>
 

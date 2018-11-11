@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://java.sun.com/jsf/html"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:p="http://primefaces.org/ui">
+<body>
+	<ui:composition>
+		<h:form id="form">
+			<p:messages closable="true" />
+
+			<p:menubar>
+
+				<p:menuitem style="font-weight:bold" value="HarmoBeer"
+					action="/inicial.xhtml" />
+
+				<p:submenu label="Perfil"
+					rendered="#{loginBean.renderizarUserLog == true}">
+					<p:menuitem value="Editar perfil" />
+					<p:menuitem value="Histórico de avaliações" url="#" />
+				</p:submenu>
+
+				<p:submenu label="Harmonização">				
+					<p:menuitem value="Harmonizações"
+						action="/harmonizacao/harmonizacao.xhtml" />
+					<p:menuitem value="Ver Rankings"
+						action="/harmonizacao/verRankings.xhtml" />
+				</p:submenu>
+
+
+				<p:menuitem value="Painel de Administração"
+					rendered="#{loginBean.privilegio == true}" />
+
+				<p:menuitem value="Sobre nós" />
+
+				<f:facet name="options">
+
+					<p:inputText value="#{loginBean.username}"
+						style="margin-right:10px" placeholder="Username"
+						rendered="#{loginBean.renderizarUserLog == false}" />
+					<p:password id="nonFeedback" value="#{loginBean.senha}"
+						style="margin-right:10px" placeholder="Senha"
+						rendered="#{loginBean.renderizarUserLog == false}" />
+					<p:commandButton value="Entrar" action="#{loginBean.entrar()}"
+						update="form" rendered="#{loginBean.renderizarUserLog == false}" />
+					<p:commandButton value="Cadastrar"
+						action="/usuario/cadastroUsuario" style="margin-right:10px"
+						rendered="#{loginBean.renderizarUserLog == false}" />
+
+					<p:outputLabel value=" Olá #{loginBean.username}"
+						style="margin-right:10px"
+						rendered="#{loginBean.renderizarUserLog == true}" />
+					<p:commandButton value="Sair" action="#{loginBean.sair()}"
+						update="form" rendered="#{loginBean.renderizarUserLog == true}" />
+
+				</f:facet>
+			</p:menubar>
+		</h:form>
+	</ui:composition>
+</body>
+</html>

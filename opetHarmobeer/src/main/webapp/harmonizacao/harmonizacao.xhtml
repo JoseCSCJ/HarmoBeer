@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<title>HarmoBeer</title>
+</h:head>
+<body>
+	<ui:composition template="/template/layout.xhtml">
+
+		<ui:define name="content">
+			<div align="center"
+				style="border: 1px dashed gray; margin-top: 10px; margin-bottom: 10px; margin-left: 20%; margin-right: 20%">
+				<h:outputText style="font-size:20px; font-style:verdana"
+					value="Essa é a página de harmonizações. Nela você pode verificar todos os itens de prato e cervejas em nosso catálogo e, se logado, avaliar e ver as avaliações. Caso não encontre um produto no catálogo, nos envie uma sugestão através do email harmobeer@harmobeer.com.br"></h:outputText>
+
+			</div>
+			<div align="center">
+				<p:panelGrid columns="2" layout="grid" style="margin:20px"
+					align="center">
+
+					<h:form id="cerv">
+						<p:outputLabel for="buscarCerv">Qual cerveja deseja buscar?</p:outputLabel>
+						<br />
+
+						<p:selectOneMenu id="buscarCerv"
+							value="#{harmonizacaoBean.idCervejaSelecionada}" effect="fade"
+							filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Selecione uma" itemValue="" />
+							<f:selectItems value="#{harmonizacaoBean.listaCerv}" />
+						</p:selectOneMenu>
+						<br />
+						<p:commandButton for="buscarCerv" update="harmo aval avaliacoes"
+							value="Selecionar" action="#{harmonizacaoBean.selecionarCerv()}" />
+					</h:form>
+
+					<h:form id="prato">
+						<p:outputLabel for="buscarPrato">Qual prato deseja buscar?</p:outputLabel>
+						<br />
+						<p:selectOneMenu id="buscarPrato"
+							value="#{harmonizacaoBean.idPratoSelecionado}" effect="fade"
+							filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Selecione um" itemValue="" />
+							<f:selectItems value="#{harmonizacaoBean.listaPrato}" />
+						</p:selectOneMenu>
+						<br />
+						<p:commandButton for="buscarPrato" update="harmo aval avaliacoes"
+							value="Selecionar" action="#{harmonizacaoBean.selecionarPrato()}" />
+					</h:form>
+
+				</p:panelGrid>
+			</div>
+
+			<p:panelGrid columns="3" id="harmo" style="margin:20px">
+
+				<p:column>
+					<p:panelGrid>
+						<f:facet name="header">
+							<p:row>
+								<p:column colspan="8">Harmonização</p:column>
+							</p:row>
+							<p:row>
+								<p:column colspan="3">Cerveja</p:column>
+								<p:column colspan="3">Prato</p:column>
+								<p:column colspan="2">Média</p:column>
+							</p:row>
+						</f:facet>
+						<p:row>
+							<p:column colspan="3">
+								<h:outputText value="#{harmonizacaoBean.nm_cerv}"></h:outputText>
+							</p:column>
+							<p:column colspan="3">
+								<h:outputText value="#{harmonizacaoBean.nm_prato}"></h:outputText>
+							</p:column>
+							<p:column colspan="2">
+								<h:outputText value="#{harmonizacaoBean.nota}"></h:outputText>
+							</p:column>
+						</p:row>
+					</p:panelGrid>
+				</p:column>
+
+				<p:column>
+					<h:outputText value="Ranking para" />
+					<h:outputText style="font-weight:bold"
+						value=" #{harmonizacaoBean.nm_cerv}" />
+					<br />
+					<h:outputText rendered="#{harmonizacaoBean.renderizarAvisoCerveja}"
+						style="color:red; font-size:13px"
+						value="Ainda não há votação para essa cerveja" />
+					<p:dataTable var="harmonizacao"
+						value="#{harmonizacaoBean.rankingCerveja}">
+
+						<p:column headerText="Prato">
+							<h:outputText value="#{harmonizacao.nm_prato}" />
+						</p:column>
+
+						<p:column headerText="Média">
+							<h:outputText value="#{harmonizacao.media}" />
+						</p:column>
+					</p:dataTable>
+				</p:column>
+
+				<p:column>
+					<h:outputText value="Ranking para" />
+					<h:outputText style="font-weight:bold"
+						value=" #{harmonizacaoBean.nm_prato}" />
+					<br />
+					<h:outputText rendered="#{harmonizacaoBean.renderizarAvisoPrato}"
+						style="color:red; font-size:13px"
+						value="Ainda não há votação para esse prato" />
+
+					<p:dataTable var="harmonizacao"
+						value="#{harmonizacaoBean.rankingPrato}">
+
+
+						<p:column headerText="Cerveja">
+							<h:outputText value="#{harmonizacao.nm_cerv}" />
+						</p:column>
+
+						<p:column headerText="Média">
+							<h:outputText value="#{harmonizacao.media}" />
+						</p:column>
+					</p:dataTable>
+				</p:column>
+			</p:panelGrid>
+
+			<div align="center">
+				<p:panelGrid align="center" style="margin: 20px" columns="2">
+					<p:column>
+						<h:form id="aval">
+							<h:outputText rendered="#{loginBean.renderizarUserLog == false}"
+								value="Você precisa estar logado para fazer uma avaliação" />
+
+
+							<p:messages />
+							<p:panelGrid rendered="#{loginBean.renderizarUserLog == true}">
+
+								<p:row>
+									<p:column>
+										<h:outputText style="font-weight:bold"
+											value="Cerveja: #{harmonizacaoBean.nm_cerv}"></h:outputText>
+									</p:column>
+									<p:column>
+										<h:outputText style="font-weight:bold"
+											value="Prato: #{harmonizacaoBean.nm_prato}"></h:outputText>
+									</p:column>
+								</p:row>
+
+
+								<p:row>
+									<p:column>
+										<p:outputLabel for="nota" value="Nota" />
+									</p:column>
+									<p:column>
+										<p:rating id="nota" value="#{harmonizacaoBean.nota}"
+											stars="10" cancel="false" />
+									</p:column>
+								</p:row>
+
+								<p:row>
+									<p:column>
+										<p:outputLabel for="comentario" value="Comentario" />
+									</p:column>
+									<p:column>
+										<p:inputTextarea id="comentario" rows="6" cols="20"
+											value="#{harmonizacaoBean.comentario}" />
+									</p:column>
+								</p:row>
+
+								<f:facet name="footer">
+									<p:row>
+										<p:column colspan="2">
+											<p:commandButton action="#{harmonizacaoBean.cadastrarAval()}"
+												value="Submeter Avaliação" update="aval avaliacoes"
+												align="center" />
+										</p:column>
+									</p:row>
+								</f:facet>
+
+							</p:panelGrid>
+						</h:form>
+					</p:column>
+					<p:column>
+						<h:outputText rendered="#{loginBean.renderizarUserLog == false}"
+							value="Você precisa estar logado para ver as avaliações" />
+
+						<p:dataGrid id="avaliacoes" var="avaliacao"
+							rendered="#{loginBean.renderizarUserLog == true}"
+							value="#{harmonizacaoBean.listaAval}" columns="1" rows="5"
+							paginator="true"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+							<f:facet name="header">
+								<p:column colspan="6">Avaliações</p:column>
+							</f:facet>
+
+							<p:panelGrid style="width:100%; margin:3px">
+								<f:facet name="header">
+									<p:column colspan="2">
+										<h:outputText value="Avaliação de #{avaliacao.username}" />
+									</p:column>
+								</f:facet>
+								<p:row>
+									<p:column style="width:80px">
+										<h:outputText style="font-weight:bold" value="Comentário" />
+									</p:column>
+									<p:column>
+										<h:outputText value="#{avaliacao.comentario}" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column style="width:80px">
+										<h:outputText style="font-weight:bold" value="Nota" />
+									</p:column>
+									<p:column>
+										<h:outputText value="#{avaliacao.nota}" />
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+
+						</p:dataGrid>
+
+					</p:column>
+				</p:panelGrid>
+			</div>
+		</ui:define>
+	</ui:composition>
+
+</body>
+</html>

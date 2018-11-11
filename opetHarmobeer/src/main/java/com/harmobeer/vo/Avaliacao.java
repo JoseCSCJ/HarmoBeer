@@ -48,6 +48,20 @@ public class Avaliacao {
 		this.nota = nota;
 		this.comentario = comentario;
 	}
+	/**
+	 * @param id_aval
+	 * @param id_user
+	 * @param username
+	 * @param nota
+	 * @param comentario
+	 */
+	public Avaliacao(int id_aval, int id_user, String username, int nota, String comentario) {
+		this.id_aval = id_aval;			
+		this.id_user = id_user;
+		this.username = username;
+		this.nota = nota;
+		this.comentario = comentario;
+	}
 
 
 	
@@ -89,6 +103,12 @@ public class Avaliacao {
 	public Avaliacao(int nota, String comentario) {
 		this.nota = nota;
 		this.comentario = comentario;
+	}
+	/**
+	 * Construtor vazio para avaliacao
+	 */
+	public Avaliacao() {
+		
 	}
 
 

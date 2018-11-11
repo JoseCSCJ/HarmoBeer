@@ -36,6 +36,7 @@ public class HarmoBeerBean implements Serializable {
 	private String senhaant;
 	private String info;
 	private String email;
+	private boolean privilegio;
 	private int idUsuarioSelecionado;
 
 	private String usernameSelec;
@@ -62,7 +63,7 @@ public class HarmoBeerBean implements Serializable {
 	private boolean editado = false;
 	private boolean deletado = false;
 	private boolean cadastrado = false;
-	private boolean renderizar = false;
+	private boolean renderizarUserLog = false;
 	private boolean selecionado = false;
 	private String nomeAdmin;
 
@@ -86,6 +87,7 @@ public class HarmoBeerBean implements Serializable {
 	private ArrayList<Harmonizacao> ranking;
 
 	private Harmonizacao harmonizacaoSelecionada;
+	private ArrayList<Harmonizacao> rankingGeral = new ArrayList<Harmonizacao>();
 	private HarmonizacaoController harmonizacaoController;
 
 	private String comentario;
@@ -118,6 +120,9 @@ public class HarmoBeerBean implements Serializable {
 		harmonizacaoController = new HarmonizacaoController();
 
 		avaliacaoController = new AvaliacaoController();
+		
+		retornarRankingGeral();
+		ultAvaliacao();
 
 	}
 
@@ -131,33 +136,62 @@ public class HarmoBeerBean implements Serializable {
 
 		// Atualizar as harmonizacoes ao logar no sistema
 		try {
-		ArrayList<Harmonizacao> h = new ArrayList<Harmonizacao>();
-		h = harmonizacaoController.listarTodos();
-		for (Harmonizacao ha : h) {
-			harmonizacaoController.calcularMedia(ha);
-		}
+			ArrayList<Harmonizacao> h = new ArrayList<Harmonizacao>();
+			h = harmonizacaoController.listarTodos();
+			for (Harmonizacao ha : h) {
+				harmonizacaoController.calcularMedia(ha);
+			}
 
-		usuarioLogado = usuarioController.logar(getUsername(), getSenha());
+			usuarioLogado = usuarioController.logar(getUsername(), getSenha());
 
-		if (usuarioLogado != null) {
-			setEmail(usuarioLogado.getEmail());
-			setInfo(usuarioLogado.getInfo());
-			setSenhaconf(usuarioLogado.getSenha());
+			if (usuarioLogado != null) {
+				setEmail(usuarioLogado.getEmail());
+				setInfo(usuarioLogado.getInfo());
+				setSenhaconf(usuarioLogado.getSenha());
+				setPrivilegio(usuarioController.verificarPrivilegio(usuarioLogado));
+				renderizarUserLog = true;
 
-			return "/harmobeer/menuPrincipal";
-		} else {
-			zerarUsuario();
-			Util.mensagemErro("valNull", "O usuário ou a senha não estão corretos.");
+				return "/inicial";
+			} else {
+				zerarUsuario();
+				Util.mensagemErro("valNull", "O usuário ou a senha não estão corretos.");
+				renderizarUserLog = false;
 
-			return "";
-		}
-		}catch(Exception e) {
+				return "/inicial";
+			}
+		} catch (Exception e) {
 			FacesContext f = FacesContext.getCurrentInstance();
 			f.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, "Erro interno", "Contacte o Admin"));
 			e.printStackTrace();
 			return "";
 		}
-	
+
+	}
+
+	/**
+	 * Metodo para deslogar no sistema.
+	 * 
+	 * @return página inicial ou mensagem de erro ao logar.
+	 */
+	public String sair() {
+
+		try {
+			if (usuarioLogado != null) {
+				zerarUsuario();
+				renderizarUserLog = false;
+				return "/inicial";
+			} else {
+				zerarUsuario();
+				Util.mensagemErro("valNull", "Ocorreu um erro");
+				renderizarUserLog = false;
+				return "/inicial";
+			}
+		} catch (Exception e) {
+			FacesContext f = FacesContext.getCurrentInstance();
+			f.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, "Erro interno", "Contacte o Admin"));
+			e.printStackTrace();
+			return "";
+		}
 
 	}
 
@@ -243,18 +277,6 @@ public class HarmoBeerBean implements Serializable {
 			usuarioLogado.setUsername(usernameAnterior);
 			return "/usuario/erroEdicao";
 		}
-	}
-
-	/**
-	 * Metodo para verificar se o usuario tem privilegio de administrador,
-	 * permitindo que esses componentes aparecam em sala.
-	 * 
-	 * @return boolean
-	 */
-	public boolean verificarPrivilegio() {
-
-		return usuarioController.verificarPrivilegio(usuarioLogado);
-
 	}
 
 	/**
@@ -464,11 +486,30 @@ public class HarmoBeerBean implements Serializable {
 	}
 
 	/**
+	 * Método que retorna um ranking geral das harmonizações, sem definir um prato
+	 * ou cerveja.
+	 * 
+	 */
+	public void retornarRankingGeral() {
+		try {
+
+			ArrayList<Harmonizacao> rankingPrev = new ArrayList<Harmonizacao>();
+			rankingPrev = harmonizacaoController.listarTodos();
+			
+			for (int i = 0; i < 10; i++) {
+				rankingGeral.add(rankingPrev.get(i));
+			}
+			setRankingGeral(rankingGeral);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	/**
 	 * Metodo privado que retorna as avaliacoes de determinada usuario, utilizado
 	 * quando se seleciona um usuario para criar a lista de avaliacoes. .
 	 */
 	private void retornarAval() {
-
 		ArrayList<Avaliacao> listaAvalProv = (ArrayList<Avaliacao>) avaliacaoController
 				.listarAvalporUser(idUsuarioSelecionado);
 		ArrayList<Avaliacao> listaAvalComp = new ArrayList<Avaliacao>();
@@ -487,6 +528,29 @@ public class HarmoBeerBean implements Serializable {
 		}
 		setAvaliacoes(listaAvalComp);
 	}
+	
+	public void ultAvaliacao() {
+		try {
+			int id = avaliacaoController.selecionarUltAval();
+			Avaliacao aval = avaliacaoController.selecionarAval(id);
+			Usuario u = usuarioController.selecionarUser(aval.getId_user());
+			Harmonizacao h = harmonizacaoController.selecionarHarmo(aval.getId_harmo());
+			Cerveja c = cervejaController.selecionarCerveja(h.getId_cerv());
+			Prato p = pratoController.selecionarPrato(h.getId_prato());
+			setNmCervAvalSelec(c.getNm_cerv());
+			setNmPratoAvalSelec(p.getNm_prato());
+			setUsernameAvalSelec(u.getUsername());
+			setNotaAvalSelec(aval.getNota());
+			setComentarioAvalSelec(aval.getComentario());
+			System.out.println("O id do comentario eh " + id);
+			System.out.println("Do usuario " + usernameAvalSelec);
+			
+			
+		}catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
 
 	/**
 	 * Metodo que retorna as avaliacoes feitas pelo usuario logado
@@ -533,18 +597,19 @@ public class HarmoBeerBean implements Serializable {
 	 * 
 	 * @return confirmacao da avaliacao ou erro ao avaliar.
 	 */
-	public String avaliarHarmonizacao() {
-		Avaliacao aval = new Avaliacao(nota, comentario);
-		if (avaliacaoController.incluirAvaliacao(aval, usuarioLogado, harmonizacaoSelecionada)) {
-			harmonizacaoController.calcularMedia(harmonizacaoSelecionada);
-			setHarmonizacaoSelecionada(harmonizacaoController.selecionarHarmo(
-					harmonizacaoController.selecionaridHarmonizacao(cervejaSelecionada, pratoSelecionado)));
-			setMedia(harmonizacaoSelecionada.getMedia());
-			return "/harmonizacao/confirmaAvaliacao";
-		} else {
-			return "/harmobeer/erroAvaliarNova";
-		}
-	}
+
+//	public String avaliarHarmonizacao() {
+//		Avaliacao aval = new Avaliacao(nota, comentario);
+//		if (avaliacaoController.incluirAvaliacao(aval, usuarioLogado, harmonizacaoSelecionada)) {
+//			harmonizacaoController.calcularMedia(harmonizacaoSelecionada);
+//			setHarmonizacaoSelecionada(harmonizacaoController.selecionarHarmo(
+//					harmonizacaoController.selecionaridHarmonizacao(cervejaSelecionada, pratoSelecionado)));
+//			setMedia(harmonizacaoSelecionada.getMedia());
+//			return "/harmonizacao/confirmaAvaliacao";
+//		} else {
+//			return "/harmobeer/erroAvaliarNova";
+//		}
+//	}
 
 	/**
 	 * Metodo para selecionar um usuario em uma lista, setando as avaliacoes feitas
@@ -582,18 +647,18 @@ public class HarmoBeerBean implements Serializable {
 	 * 
 	 * @return pagina de avaliacoes do usuario logado ou de erro
 	 */
-	public String editarAvaliacao() {
-		avaliacaoSelecionada.setNota(nota);
-		avaliacaoSelecionada.setComentario(comentario);
-		if (avaliacaoController.editarAvaliacao(avaliacaoSelecionada)) {
-			setAvaliacaoSelecionada(null);
-			return retornarSuasAval();
-		} else {
-
-			return "/usuario/erroAvaliar";
-		}
-
-	}
+//	public String editarAvaliacao() {
+//		avaliacaoSelecionada.setNota(nota);
+//		avaliacaoSelecionada.setComentario(comentario);
+//		if (avaliacaoController.editarAvaliacao(avaliacaoSelecionada)) {
+//			setAvaliacaoSelecionada(null);
+//			return retornarSuasAval();
+//		} else {
+//
+//			return "/usuario/erroAvaliar";
+//		}
+//
+//	}
 
 	/**
 	 * Metodo para o usuario deletar uma avaliacao feita por ele
@@ -1314,15 +1379,15 @@ public class HarmoBeerBean implements Serializable {
 	/**
 	 * @return the renderizar
 	 */
-	public boolean isRenderizar() {
-		return renderizar;
+	public boolean isRenderizarUserLog() {
+		return renderizarUserLog;
 	}
 
 	/**
 	 * @param renderizar the renderizar to set
 	 */
 	public void setRenderizar(boolean renderizar) {
-		this.renderizar = renderizar;
+		this.renderizarUserLog = renderizar;
 	}
 
 	/**
@@ -1564,6 +1629,20 @@ public class HarmoBeerBean implements Serializable {
 	}
 
 	/**
+	 * @return the rankingGeral
+	 */
+	public ArrayList<Harmonizacao> getRankingGeral() {
+		return rankingGeral;
+	}
+
+	/**
+	 * @param rankingGeral the rankingGeral to set
+	 */
+	public void setRankingGeral(ArrayList<Harmonizacao> rankingGeral) {
+		this.rankingGeral = rankingGeral;
+	}
+
+	/**
 	 * @return the harmonizacaoSelecionada
 	 */
 	public Harmonizacao getHarmonizacaoSelecionada() {
@@ -1718,6 +1797,20 @@ public class HarmoBeerBean implements Serializable {
 	}
 
 	/**
+	 * @return the privilegio
+	 */
+	public boolean isPrivilegio() {
+		return privilegio;
+	}
+
+	/**
+	 * @param privilegio the privilegio to set
+	 */
+	public void setPrivilegio(boolean privilegio) {
+		this.privilegio = privilegio;
+	}
+
+	/**
 	 * Metodo que zera os tipos envolvidos com o usuario para fins de limpeza de
 	 * tela.
 	 */
@@ -1726,6 +1819,7 @@ public class HarmoBeerBean implements Serializable {
 		setSenha("");
 		setEmail("");
 		setInfo("");
+		setPrivilegio(false);
 	}
 
 }

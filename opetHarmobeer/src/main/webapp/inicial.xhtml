@@ -4,83 +4,72 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
 	xmlns:h="http://xmlns.jcp.org/jsf/html"
 	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
 	xmlns:p="http://primefaces.org/ui">
 
 <h:head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
-	<title>Harmobeer - Login</title>
-	<style type="text/css">
-body {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 20px;
-}
-
-.header {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 20px;
-}
-
-.title {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-weight: bold;
-	font-size: 20px;
-}
-
-.bottom {
-	font-family: Verdana, Arial, Helvetica, sans-serif;
-	font-size: 20px;
-	text-align: center;
-	vertical-align: middle;
-	color: #000000;
-}
-</style>
+	<title>HarmoBeer</title>
 </h:head>
-<body bgcolor="#DAA520">
-	<div align="center">
-	
-		<h:form id="form">
-		
-			<div>
-				<p:outputLabel value="Bem-vindo ao Harmobeer!"></p:outputLabel>
-				<br></br>
-				<p:outputLabel value="O seu site de harmonização de
-			cervejas"></p:outputLabel>
-			</div>
 
-			<div>
-				<img
-					src="http://images.clipartlogo.com/files/images/16/160193/beer-mug_t" />
-				<img
-					src="http://icons.iconarchive.com/icons/aha-soft/desktop-buffet/256/Pizza-icon.png" />
-			</div>
-			<br />
-			<p:panelGrid id="grid" columns="2">
+<body>
+	<ui:composition template="template/layout.xhtml">
 
-				<p:outputLabel for="login" value="Login: "></p:outputLabel>
-				<p:password id="login" value="#{harmoBeerBean.username}" size="20"/>
+		<ui:define name="content">
+			<h1 style="font-family:Verdana; color:gray" align="center">HarmoBeer</h1>
 
-				<p:outputLabel for="senha" value="Senha: "></p:outputLabel>
-				<p:password id="senha" value="#{harmoBeerBean.senha}" size="20"/>
-				
-				
+			<p:panelGrid columns="3" layout="grid">
+
+				<p:column>
+					<h2 align="center">Última Avaliação</h2>
+					<p:panelGrid style="margin: 0 auto" columns="2">
+						<h:outputText style="font-weight:bold; font-size:30px"
+							value="Usuário" />
+						<h:outputText value="#{painelInicialBean.usernameAvalSelec}" />
+
+						<h:outputText style="font-weight:bold; font-size:30px"
+							value="Cerveja" />
+						<h:outputText value="#{painelInicialBean.nmCervAvalSelec}" />
+
+						<h:outputText style="font-weight:bold; font-size:30px"
+							value="Prato" />
+						<h:outputText value="#{painelInicialBean.nmPratoAvalSelec}" />
+
+						<h:outputText style="font-weight:bold; font-size:30px"
+							value="Nota" />
+						<h:outputText value="#{painelInicialBean.notaAvalSelec}" />
+
+						<h:outputText style="font-weight:bold; font-size:30px"
+							value="Comentário" />
+						<h:outputText value="#{painelInicialBean.comentarioAvalSelec}" />
+					</p:panelGrid>
+				</p:column>
+
+				<p:column>
+					<h2 align="center">Melhores Harmonizações</h2>
+					<p:dataTable var="harmonizacao"
+						value="#{painelInicialBean.rankingGeral}">
+
+						<p:column headerText="Cerveja">
+							<h:outputText value="#{harmonizacao.nm_cerv}" />
+						</p:column>
+
+						<p:column headerText="Prato">
+							<h:outputText value="#{harmonizacao.nm_prato}" />
+						</p:column>
+
+						<p:column headerText="Nota">
+							<h:outputText value="#{harmonizacao.media}" />
+						</p:column>
+					</p:dataTable>
+				</p:column>
+
+				<p:column>
+					<h2 align="center">Parceiros</h2>
+					<h:outputText value="Deseja se tornar um parceiro? Solicite um orçamento através do email harmobeer@harmobeer.com.br!"/>
+				</p:column>
 			</p:panelGrid>
-			<p:messages closable="true"/>
-			
-			
-			
-			<br />
-
-			<br />
-
-			<p:commandButton value="Entrar" id="entrar"
-				action="#{harmoBeerBean.entrar()}" update="form"  />
-		</h:form>
-
-
-		<h:form>
-			<h:link outcome="/usuario/cadastroUsuario"
-				value="Ainda não é membro? Cadastre-se aqui!" />
-		</h:form>
-	</div>
+		</ui:define>
+	</ui:composition>
 </body>
 </html>

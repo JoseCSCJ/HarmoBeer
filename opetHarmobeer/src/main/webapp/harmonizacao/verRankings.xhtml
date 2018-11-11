@@ -1,0 +1,139 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<title>HarmoBeer</title>
+</h:head>
+<body>
+	<ui:composition template="/template/layout.xhtml">
+
+		<ui:define name="content">
+			<div align="center"
+				style="border: 1px dashed gray; margin-top: 10px; margin-bottom: 10px; margin-left: 20%; margin-right: 20%">
+				<h:outputText style="font-size:20px; font-style:verdana"
+					value="Essa é a página de rankings. Nela você pode ver o ranking detalhado de pratos e cervejas no nosso catálogo. Após experimentar alguma combinação, você poderá fazer a avaliação na página de harmonizações.  Caso não encontre um produto no catálogo, nos envie uma sugestão através do email harmobeer@harmobeer.com.br"></h:outputText>
+
+			</div>
+			<div align="center">
+				<p:panelGrid columns="2" layout="grid" style="margin:20px"
+					align="center">
+
+					<h:form id="cerv">
+						<p:outputLabel for="buscarCerv">Qual cerveja deseja buscar?</p:outputLabel>
+						<br />
+
+						<p:selectOneMenu id="buscarCerv"
+							value="#{harmonizacaoBean.idCervejaSelecionada}" effect="fade"
+							filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Selecione uma" itemValue="" />
+							<f:selectItems value="#{harmonizacaoBean.listaCerv}" />
+						</p:selectOneMenu>
+						<br />
+						<p:commandButton for="buscarCerv"
+							update=" harmo harmoPrato harmoCerveja" value="Selecionar"
+							action="#{harmonizacaoBean.selecionarCerv()}" />
+					</h:form>
+
+					<h:form id="prato">
+						<p:outputLabel for="buscarPrato">Qual prato deseja buscar?</p:outputLabel>
+						<br />
+						<p:selectOneMenu id="buscarPrato"
+							value="#{harmonizacaoBean.idPratoSelecionado}" effect="fade"
+							filter="true" filterMatchMode="contains">
+							<f:selectItem itemLabel="Selecione um" itemValue="" />
+							<f:selectItems value="#{harmonizacaoBean.listaPrato}" />
+						</p:selectOneMenu>
+						<br />
+						<p:commandButton for="buscarPrato"
+							update=" harmo harmoPrato harmoCerveja" value="Selecionar"
+							action="#{harmonizacaoBean.selecionarPrato()}" />
+					</h:form>
+
+				</p:panelGrid>
+			</div>
+			<div align="center">
+				<p:panelGrid columns="2" id="harmo" style="margin:20px; width:70%">
+
+					<p:column>
+						<h:outputText value="Ranking para" />
+						<h:outputText style="font-weight:bold" value=" #{harmonizacaoBean.nm_cerv}" />
+						<br />
+						<h:outputText
+							rendered="#{harmonizacaoBean.renderizarAvisoCerveja}"
+							style="color:red; font-size:13px"
+							value="Ainda não há votação para essa cerveja" />
+						<p:dataGrid id="harmoCerveja" var="harmonizacao"
+							value="#{harmonizacaoBean.rankingCervejaTotal}" columns="1"
+							rows="6" paginator="true"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+							<p:panelGrid style="width:100%">
+								<p:column>
+									<h:outputText style="font-weight:bold" value="Prato" />
+								</p:column>
+
+								<p:column style="width:60px; font-weight:bold">
+									<h:outputText value="Média" />
+								</p:column>
+							</p:panelGrid>
+							<p:panelGrid style="width:100%">
+
+								<p:column>
+									<h:outputText value="#{harmonizacao.nm_prato}" />
+								</p:column>
+
+								<p:column style="width:60px">
+									<h:outputText value="#{harmonizacao.media}" />
+								</p:column>
+							</p:panelGrid>
+						</p:dataGrid>
+					</p:column>
+
+					<p:column>
+						<h:outputText value="Ranking para" />
+						<h:outputText style="font-weight:bold" value=" #{harmonizacaoBean.nm_prato}" />
+						<br />
+						<h:outputText rendered="#{harmonizacaoBean.renderizarAvisoPrato}"
+							style=" color:red; font-size:13px"
+							value="Ainda não há votação para esse prato" />
+
+						<p:dataGrid id="harmoPrato" var="harmonizacao"
+							value="#{harmonizacaoBean.rankingPratoTotal}" columns="1"
+							rows="6" paginator="true"
+							paginatorTemplate="{CurrentPageReport}  {FirstPageLink} {PreviousPageLink} {PageLinks} {NextPageLink} {LastPageLink}">
+							<p:panelGrid style="width:100%">
+								<p:column>
+									<h:outputText style="font-weight:bold" value="Cerveja" />
+								</p:column>
+
+								<p:column style="width:60px; font-weight:bold">
+									<h:outputText value="Média" />
+								</p:column>
+							</p:panelGrid>
+
+							<p:panelGrid style="width:100%">
+								<p:column>
+									<h:outputText value="#{harmonizacao.nm_cerv}" />
+								</p:column>
+
+								<p:column style="width:60px">
+									<h:outputText value="#{harmonizacao.media}" />
+								</p:column>
+							</p:panelGrid>
+
+						</p:dataGrid>
+					</p:column>
+				</p:panelGrid>
+			</div>
+
+		</ui:define>
+	</ui:composition>
+
+</body>
+</html>
