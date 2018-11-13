@@ -1,11 +1,22 @@
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.inject.Named;
 
+import com.harmobeer.mvc.controller.AvaliacaoController;
+import com.harmobeer.mvc.controller.CervejaController;
+import com.harmobeer.mvc.controller.HarmonizacaoController;
+import com.harmobeer.mvc.controller.PratoController;
 import com.harmobeer.mvc.controller.UsuarioController;
 import com.harmobeer.util.Util;
+import com.harmobeer.vo.Avaliacao;
+import com.harmobeer.vo.Cerveja;
+import com.harmobeer.vo.Harmonizacao;
+import com.harmobeer.vo.Prato;
 import com.harmobeer.vo.Usuario;
 
 /**
@@ -25,7 +36,11 @@ public class LoginBean implements Serializable {
 
 	private Usuario usuarioLogado;
 
+	private CervejaController cervejaController;
+	private PratoController pratoController;
 	private UsuarioController usuarioController;
+	private AvaliacaoController avaliacaoController;
+	private HarmonizacaoController harmonizacaoController;
 
 	private int id_user;
 	private String username;
@@ -35,11 +50,18 @@ public class LoginBean implements Serializable {
 	private String email;
 	private boolean privilegio;
 
-	private boolean renderizarUserLog;
+	private boolean renderizarUserLog;	
+
+	private List<Avaliacao> listaAval = new ArrayList<Avaliacao>();
+	private Avaliacao avalSelec;
 
 	public LoginBean() {
 		usuarioLogado = new Usuario();
+		cervejaController = new CervejaController();
+		pratoController = new PratoController();
 		usuarioController = new UsuarioController();
+		avaliacaoController = new AvaliacaoController();
+		harmonizacaoController = new HarmonizacaoController();
 		renderizarUserLog = false;
 	}
 
@@ -61,6 +83,7 @@ public class LoginBean implements Serializable {
 				setPrivilegio(usuarioController.verificarPrivilegio(usuarioLogado));
 				renderizarUserLog = true;
 				Util.setSessionParameter("userLog", usuarioLogado);
+				listarAval();
 
 			} else {
 				zerarUsuario();
@@ -157,6 +180,44 @@ public class LoginBean implements Serializable {
 		catch (	Exception e) {
 			Util.mensagemErro("Não foi alterar sua senha.");
 			e.printStackTrace();
+		}
+
+	}
+	
+	public void listarAval() {
+		try {
+			ArrayList<Avaliacao> listaProv = new ArrayList<Avaliacao>();
+
+			for (Avaliacao a : avaliacaoController.listarAvalporUser(getId_user())) {
+				Harmonizacao h = harmonizacaoController.selecionarHarmo(a.getId_harmo());
+				Prato p = pratoController.selecionarPrato(h.getId_prato());
+				Cerveja c = cervejaController.selecionarCerveja(h.getId_cerv());
+				Avaliacao aval = new Avaliacao(a.getId_aval(), a.getId_harmo(), c.getNm_cerv(), p.getNm_prato(),
+						getId_user(), getUsername(), a.getNota(), a.getComentario());				
+				listaProv.add(aval);
+			}
+			
+			
+			setListaAval(listaProv);
+
+		} catch (Exception e) {
+			Util.mensagemErro("Não foi possível carregar as avaliações desse usuário");
+			e.printStackTrace();
+		}
+	}
+
+	public void removerAval() {
+		try {
+			if (avaliacaoController.deletarAvaliacao(getAvalSelec())) {
+				listarAval();
+				Util.mensagemInfo("Avaliação apagada!");
+			} else {
+				Util.mensagemErro("Não foi possível apagar essa avaliação...");
+			}
+		} catch (Exception e) {
+			Util.mensagemErro("Não foi possível apagar essa avaliação...");
+			e.printStackTrace();
+
 		}
 
 	}
@@ -298,6 +359,34 @@ public class LoginBean implements Serializable {
 	 */
 	public void setRenderizarUserLog(boolean renderizarUserLog) {
 		this.renderizarUserLog = renderizarUserLog;
+	}
+
+	/**
+	 * @return the listaAval
+	 */
+	public List<Avaliacao> getListaAval() {
+		return listaAval;
+	}
+
+	/**
+	 * @param listaAval the listaAval to set
+	 */
+	public void setListaAval(List<Avaliacao> listaAval) {
+		this.listaAval = listaAval;
+	}
+
+	/**
+	 * @return the avalSelec
+	 */
+	public Avaliacao getAvalSelec() {
+		return avalSelec;
+	}
+
+	/**
+	 * @param avalSelec the avalSelec to set
+	 */
+	public void setAvalSelec(Avaliacao avalSelec) {
+		this.avalSelec = avalSelec;
 	}
 
 }

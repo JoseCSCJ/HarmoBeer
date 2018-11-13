@@ -87,7 +87,6 @@ public class HarmonizacaoBean implements Serializable {
 		avaliacaoController = new AvaliacaoController();
 
 		usuarioController = new UsuarioController();
-		
 
 	}
 
@@ -142,11 +141,13 @@ public class HarmonizacaoBean implements Serializable {
 				harmonizacaoController.incluirHarmonizacao(cervejaSelecionada, pratoSelecionado);
 				int id = harmonizacaoController.selecionaridHarmonizacao(cervejaSelecionada, pratoSelecionado);
 				setHarmonizacaoSelecionada(harmonizacaoController.selecionarHarmo(id));
+				harmonizacaoController.calcularMedia(harmonizacaoSelecionada);
 				setMedia(harmonizacaoSelecionada.getMedia());
 				retornarAval();
+				retornarRankingCerveja();
 			}
 			retornarRankingPrato();
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -160,15 +161,18 @@ public class HarmonizacaoBean implements Serializable {
 		try {
 			setCervejaSelecionada(cervejaController.selecionarCerveja(idCervejaSelecionada));
 			setNm_cerv(cervejaSelecionada.getNm_cerv());
+			setEstilo_cerv(cervejaSelecionada.getNm_estilo());
+			setTeor_alcoolico(cervejaSelecionada.getTeor_alcool());
 			if (pratoSelecionado != null) {
 				harmonizacaoController.incluirHarmonizacao(cervejaSelecionada, pratoSelecionado);
 				int id = harmonizacaoController.selecionaridHarmonizacao(cervejaSelecionada, pratoSelecionado);
 				setHarmonizacaoSelecionada(harmonizacaoController.selecionarHarmo(id));
+				harmonizacaoController.calcularMedia(harmonizacaoSelecionada);
 				setMedia(harmonizacaoSelecionada.getMedia());
 				retornarAval();
+				retornarRankingPrato();
 			}
 			retornarRankingCerveja();
-			
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -211,7 +215,8 @@ public class HarmonizacaoBean implements Serializable {
 	}
 
 	/**
-	 * Gera o ranking total e de 10 melhores harmonizações para a cerveja selecionada.
+	 * Gera o ranking total e de 10 melhores harmonizações para a cerveja
+	 * selecionada.
 	 */
 	public void retornarRankingCerveja() {
 		try {
@@ -222,7 +227,7 @@ public class HarmonizacaoBean implements Serializable {
 			int tamanhoRanking = 0;
 			ArrayList<Harmonizacao> rankingTodos = new ArrayList<Harmonizacao>();
 			ArrayList<Harmonizacao> ranking10 = new ArrayList<Harmonizacao>();
-			
+
 			rankingTodos = harmonizacaoController
 					.gerarRanking(cervejaController.selecionarCerveja(idCervejaSelecionada));
 			setRankingCervejaTotal(rankingTodos);
@@ -253,7 +258,7 @@ public class HarmonizacaoBean implements Serializable {
 	public void cadastrarAval() {
 		try {
 			Avaliacao aval = new Avaliacao(nota, comentario);
-			usuarioLogado=(Usuario) Util.getSessionParameter("userLog");			
+			usuarioLogado = (Usuario) Util.getSessionParameter("userLog");
 			avaliacaoController.incluirAvaliacao(aval, usuarioLogado, harmonizacaoSelecionada);
 			harmonizacaoController.calcularMedia(harmonizacaoSelecionada);
 			setMedia(harmonizacaoSelecionada.getMedia());
@@ -261,6 +266,8 @@ public class HarmonizacaoBean implements Serializable {
 			setNota(0);
 			setComentario(null);
 			retornarAval();
+			retornarRankingPrato();
+			retornarRankingCerveja();
 
 		} catch (Exception e) {
 			Util.mensagemErro("Não foi possível efetuar a avaliação! Verifique se todos os campos foram preenchidos.");
@@ -276,7 +283,7 @@ public class HarmonizacaoBean implements Serializable {
 	public void retornarAval() {
 		try {
 			List<Avaliacao> aval = new ArrayList<Avaliacao>();
-			List<Avaliacao> listaCompleta = new ArrayList <Avaliacao>();
+			List<Avaliacao> listaCompleta = new ArrayList<Avaliacao>();
 			int idHarmo = harmonizacaoController.selecionaridHarmonizacao(cervejaSelecionada, pratoSelecionado);
 			aval = avaliacaoController.listarAvalporHarmo(idHarmo);
 			for (Avaliacao a : aval) {
