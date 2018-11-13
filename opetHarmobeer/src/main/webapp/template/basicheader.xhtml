@@ -18,7 +18,7 @@
 
 				<p:submenu label="Perfil"
 					rendered="#{loginBean.renderizarUserLog == true}">
-					<p:menuitem value="Editar perfil" />
+					<p:menuitem value="Editar perfil" action="/usuario/editarCadastro.xhtml" />
 					<p:menuitem value="Histórico de avaliações" url="#" />
 				</p:submenu>
 
@@ -31,9 +31,9 @@
 
 
 				<p:menuitem value="Painel de Administração"
-					rendered="#{loginBean.privilegio == true}" />
+					rendered="#{loginBean.privilegio == true}" action="/harmobeer/painelAdmin.xhtml" />
 
-				<p:menuitem value="Sobre nós" />
+				<p:menuitem value="Sobre nós" action="/harmobeer/sobreNos.xhtml"/>
 
 				<f:facet name="options">
 
@@ -46,7 +46,7 @@
 					<p:commandButton value="Entrar" action="#{loginBean.entrar()}"
 						update="form" rendered="#{loginBean.renderizarUserLog == false}" />
 					<p:commandButton value="Cadastrar"
-						action="/usuario/cadastroUsuario" style="margin-right:10px"
+						action="/usuario/cadastro" style="margin-right:10px"
 						rendered="#{loginBean.renderizarUserLog == false}" />
 
 					<p:outputLabel value=" Olá #{loginBean.username}"

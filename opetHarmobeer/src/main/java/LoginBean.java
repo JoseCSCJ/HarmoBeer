@@ -20,30 +20,29 @@ import com.harmobeer.vo.Usuario;
 @Named(value = "loginBean")
 @SessionScoped
 public class LoginBean implements Serializable {
-	
+
 	private static final long serialVersionUID = 1L;
-	
+
 	private Usuario usuarioLogado;
-	
+
 	private UsuarioController usuarioController;
-		
+
 	private int id_user;
 	private String username;
 	private String senha;
-	private String senhaconf;
 	private String senhaant;
 	private String info;
 	private String email;
 	private boolean privilegio;
-	
+
 	private boolean renderizarUserLog;
-	
+
 	public LoginBean() {
 		usuarioLogado = new Usuario();
 		usuarioController = new UsuarioController();
 		renderizarUserLog = false;
 	}
-	
+
 	/**
 	 * Metodo para logar no sistema.
 	 * 
@@ -51,7 +50,7 @@ public class LoginBean implements Serializable {
 	 */
 	public String entrar() {
 
-		try {	
+		try {
 
 			usuarioLogado = usuarioController.logar(getUsername(), getSenha());
 
@@ -59,10 +58,9 @@ public class LoginBean implements Serializable {
 				setId_user(usuarioLogado.getId_user());
 				setEmail(usuarioLogado.getEmail());
 				setInfo(usuarioLogado.getInfo());
-				setSenhaconf(usuarioLogado.getSenha());
 				setPrivilegio(usuarioController.verificarPrivilegio(usuarioLogado));
 				renderizarUserLog = true;
-				Util.setSessionParameter("userLog", usuarioLogado);	
+				Util.setSessionParameter("userLog", usuarioLogado);
 
 			} else {
 				zerarUsuario();
@@ -73,11 +71,12 @@ public class LoginBean implements Serializable {
 		} catch (Exception e) {
 			FacesContext f = FacesContext.getCurrentInstance();
 			f.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, "Erro interno", "Contacte o Admin"));
-			e.printStackTrace();	
+			e.printStackTrace();
 			return "";
 		}
 
 	}
+
 	/**
 	 * Metodo para deslogar no sistema.
 	 * 
@@ -90,19 +89,74 @@ public class LoginBean implements Serializable {
 				zerarUsuario();
 				Util.removeSessionParameter("userLog");
 				renderizarUserLog = false;
-				
+
 			} else {
 				zerarUsuario();
 				Util.mensagemErro("valNull", "Ocorreu um erro");
 				renderizarUserLog = false;
-				
+
 			}
 			return "/inicial.xhtml";
 		} catch (Exception e) {
 			FacesContext f = FacesContext.getCurrentInstance();
 			f.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_FATAL, "Erro interno", "Contacte o Admin"));
-			e.printStackTrace();	
+			e.printStackTrace();
 			return "";
+		}
+
+	}
+
+	/**
+	 * Edita os dados username, email e info do usuário logado no sistema.
+	 */
+	public void editar() {
+		try {
+			Usuario user = (Usuario) Util.getSessionParameter("userLog");
+			user.setUsername(username);
+			user.setEmail(email);
+			user.setInfo(info);
+
+			if (usuarioController.editar(user)) {
+				setUsuarioLogado(user);
+				Util.setSessionParameter("userLog", usuarioLogado);
+				Util.mensagemInfo("Editado com sucesso!");
+			} else {
+				Util.mensagemErro(
+						"Não foi possível processar seu requerimento. Verifique as informações ou tente mais tarde.");
+			}
+		} catch (Exception e) {
+			Util.mensagemErro(
+					"Não foi possível processar seu requerimento. Verifique as informações ou tente mais tarde.");
+			e.printStackTrace();
+		}
+
+	}
+
+	/**
+	 * Compara a senha nova com a antiga e, caso esteja certo, altera a senha do
+	 * usuário.
+	 */
+	public void alterarSenha() {
+		try {
+			Usuario user = (Usuario) Util.getSessionParameter("userLog");
+			if (getSenhaant().compareTo(user.getSenha()) == 0) {
+				user.setSenha(senha);
+				if (usuarioController.editar(user)) {
+					setUsuarioLogado(user);
+					Util.setSessionParameter("userLog", usuarioLogado);
+					Util.mensagemInfo("Senha alterada com sucesso!");
+				} else {
+					Util.mensagemErro("Não foi alterar sua senha.");
+				}
+			} else {
+				Util.mensagemErro("A senha antiga informada não é condizente...");
+
+			}
+		}
+
+		catch (	Exception e) {
+			Util.mensagemErro("Não foi alterar sua senha.");
+			e.printStackTrace();
 		}
 
 	}
@@ -174,20 +228,6 @@ public class LoginBean implements Serializable {
 	 */
 	public void setSenha(String senha) {
 		this.senha = senha;
-	}
-
-	/**
-	 * @return the senhaconf
-	 */
-	public String getSenhaconf() {
-		return senhaconf;
-	}
-
-	/**
-	 * @param senhaconf the senhaconf to set
-	 */
-	public void setSenhaconf(String senhaconf) {
-		this.senhaconf = senhaconf;
 	}
 
 	/**

@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<title>HarmoBeer</title>
+</h:head>
+<body>
+
+	<ui:composition template="/template/layout.xhtml">
+		<ui:define id="header" name="header">
+			<h:form id="form">
+
+				<p:menubar>
+
+					<p:menuitem style="font-weight:bold" value="HarmoBeer"
+						action="/inicial.xhtml" />
+
+					<p:submenu label="Perfil"
+						rendered="#{loginBean.renderizarUserLog == true}">
+						<p:menuitem value="Editar perfil"
+							action="/usuario/editarCadastro.xhtml" />
+						<p:menuitem value="Histórico de avaliações" url="#" />
+					</p:submenu>
+
+					<p:submenu label="Harmonização">
+						<p:menuitem value="Harmonizações"
+							action="/harmonizacao/harmonizacao.xhtml" />
+						<p:menuitem value="Ver Rankings"
+							action="/harmonizacao/verRankings.xhtml" />
+					</p:submenu>
+
+
+					<p:menuitem value="Painel de Administração"
+						rendered="#{loginBean.privilegio == true}" />
+
+					<p:menuitem value="Sobre nós" action="/harmobeer/sobreNos.xhtml" />
+
+					<f:facet name="options">
+
+						<p:inputText value="#{loginBean.username}"
+							style="margin-right:10px" placeholder="Username"
+							rendered="#{loginBean.renderizarUserLog == false}" />
+						<p:password id="nonFeedback" value="#{loginBean.senha}"
+							style="margin-right:10px" placeholder="Senha"
+							rendered="#{loginBean.renderizarUserLog == false}" />
+						<p:commandButton value="Entrar" action="#{loginBean.entrar()}"
+							update="form" rendered="#{loginBean.renderizarUserLog == false}" />
+						<p:commandButton value="Cadastrar" action="/usuario/cadastro"
+							style="margin-right:10px"
+							rendered="#{loginBean.renderizarUserLog == false}" />
+
+						<p:outputLabel value=" Olá #{loginBean.username}"
+							style="margin-right:10px"
+							rendered="#{loginBean.renderizarUserLog == true}" />
+						<p:commandButton value="Sair" action="#{loginBean.sair()}"
+							update="form" rendered="#{loginBean.renderizarUserLog == true}" />
+
+					</f:facet>
+				</p:menubar>
+			</h:form>
+		</ui:define>
+		<ui:define name="content">
+
+			<div align="center" style="margin: 30px">
+				<p:panelGrid columns="2">
+					<p:column>
+						<h:form id="editar">
+							<p:messages closable="true" />
+							<p:panelGrid>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="username" value="Nome de Usuário"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText id="username" value="#{loginBean.username}"
+											maxlenght="20">
+											<f:validateLength minimum="1" maximum="20" />
+										</p:inputText>
+										<p:message for="username" closable="true" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="email" value="Email"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText id="email" value="#{loginBean.email}"
+											maxlenght="50">
+											<f:validateLength minimum="1" maximum="50" />
+										</p:inputText>
+
+										<p:message for="email" closable="true" />
+									</p:column>
+
+								</p:row>
+
+								<p:row>
+									<p:column>
+										<p:outputLabel for="info" value="Conte-nos mais sobre você"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputTextarea id="info" value="#{loginBean.info}"
+											maxlenght="200" rows="6" columns="33" autoResize="true">
+											<f:validateLength minimum="1" maximum="200" />
+										</p:inputTextarea>
+										<p:message for="info" closable="true" />
+									</p:column>
+								</p:row>
+								<f:facet name="footer">
+									<p:row>
+										<p:column colspan="2">
+											<p:commandButton style="width:100%" update="editar form"
+												action="#{loginBean.editar()}" value="Editar"></p:commandButton>
+										</p:column>
+									</p:row>
+								</f:facet>
+							</p:panelGrid>
+						</h:form>
+					</p:column>
+					<p:column>
+						<h:form id="altsenha">
+						<p:messages closable="true" />
+							<p:panelGrid>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="senhaAnt" value="Senha Antiga"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:password id="senhaAnt" value="#{loginBean.senhaant}"
+											maxlenght="20">
+											<f:validateLength minimum="1" maximum="20" />
+										</p:password>
+										<p:message for="senhaAnt" closable="true" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="senha" value="Nova Senha"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:password id="senha" value="#{loginBean.senha}"
+											feedback="true" promptLabel="Entre com a sua senha"
+											weakLabel="Fraca" goodLabel="Boa" strongLabel="Forte"
+											match="senhaConf" maxlenght="20">
+											<f:validateLength minimum="1" maximum="20" />
+										</p:password>
+										<p:message for="senha" closable="true" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="senhaConf" value="Confirme a nova senha"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:password id="senhaConf" value="#{loginBean.senha}"
+											match="senhaConf" maxlenght="20" />
+										<p:message for="senhaConf" closable="true" />
+									</p:column>
+								</p:row>
+								<f:facet name="footer">
+									<p:row>
+										<p:column colspan="2">
+											<p:commandButton style="width:100%" update="altsenha"
+												action="#{loginBean.alterarSenha()}" value="Alterar Senha"></p:commandButton>
+										</p:column>
+									</p:row>
+								</f:facet>
+							</p:panelGrid>
+						</h:form>
+					</p:column>
+				</p:panelGrid>
+			</div>
+		</ui:define>
+	</ui:composition>
+
+</body>
+</html>

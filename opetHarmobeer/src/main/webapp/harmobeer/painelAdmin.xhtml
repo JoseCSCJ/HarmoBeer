@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<title>HarmoBeer</title>
+</h:head>
+
+<body>
+	<ui:composition template="/template/layout.xhtml">
+		<ui:define name="content">
+			<div align="center" style="border: dashed; margin: 20px">
+				<h1 align="center">Cadastros</h1>
+				<p:panelGrid layout="grid" columns="2" style="margin:10px">
+					<p:column>
+						<h:form id="cadCerv">
+							<p:messages closable="true" />
+							<p:panelGrid>
+								<f:facet name="header">
+									<p:row>
+										<p:column colspan="2">Cadastro de Cerveja			
+										</p:column>
+									</p:row>
+								</f:facet>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="nm_cerv" value="Nome da Cerveja"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText id="nm_cerv" value="#{adminBean.nm_cerv}"
+											maxlenght="60">
+											<f:validateLength minimum="1" maximum="60" />
+										</p:inputText>
+										<p:message for="nm_cerv" closable="true" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="estilo_cerv" value="Estilo da Cerveja"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText id="estilo_cerv" value="#{adminBean.estilo_cerv}"
+											maxlenght="60">
+											<f:validateLength minimum="1" maximum="60" />
+										</p:inputText>
+										<p:message for="estilo_cerv" closable="true" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="teor" value="Teor Alcóolico"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText id="teor" value="#{adminBean.teor}"
+											maxlenght="60">
+											<f:validateDoubleRange minimum="0.00" maximum="70.00" />
+										</p:inputText>
+										<p:message for="teor" closable="true" />
+									</p:column>
+								</p:row>
+								<f:facet name="footer">
+									<p:row>
+										<p:column colspan="2">
+											<p:commandButton style="width:100%" update="cadCerv edCerv"
+												action="#{adminBean.cadastrarCerv()}"
+												value="Cadastrar Cerveja"></p:commandButton>
+										</p:column>
+									</p:row>
+								</f:facet>
+							</p:panelGrid>
+						</h:form>
+					</p:column>
+					<p:column>
+						<h:form id="cadPrato">
+							<p:messages closable="true" />
+							<p:panelGrid style="margin:30px">
+								<f:facet name="header">
+									<p:row>
+										<p:column colspan="2">Cadastro de Prato		
+										</p:column>
+									</p:row>
+								</f:facet>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="nm_prato" value="Nome do Prato"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText id="nm_prato" value="#{adminBean.nm_prato}"
+											maxlenght="60">
+											<f:validateLength minimum="1" maximum="30" />
+										</p:inputText>
+										<p:message for="nm_prato" closable="true" />
+									</p:column>
+								</p:row>
+								<f:facet name="footer">
+									<p:row>
+										<p:column colspan="2">
+											<p:commandButton style="width:100%" update="cadPrato edPrato"
+												action="#{adminBean.cadastrarPrato()}"
+												value="Cadastrar Prato"></p:commandButton>
+										</p:column>
+									</p:row>
+								</f:facet>
+							</p:panelGrid>
+						</h:form>
+					</p:column>
+				</p:panelGrid>
+			</div>
+			<div style="border: dashed; margin: 20px">
+				<h1 align="center">Edição e Remoção</h1>
+				<p:panelGrid layout="grid" columns="2" style="margin:10px">
+					<p:column>
+						<h:form id="edCerv">
+							<p:panelGrid>
+								<p:messages closable="true" />
+								<f:facet name="header">
+									<p:row>
+										<p:column colspan="2"> Cerveja			
+										</p:column>
+									</p:row>
+								</f:facet>
+								<p:row>
+									<p:column>
+										<h:form id="listCerv">
+											<p:outputLabel for="buscarCerv">Qual cerveja deseja buscar?</p:outputLabel>
+											<p:selectOneMenu id="buscarCerv"
+												value="#{adminBean.idCervSelec}" effect="fade" filter="true"
+												filterMatchMode="contains">
+												<f:selectItem itemLabel="Selecione uma" itemValue="" />
+												<f:selectItems value="#{adminBean.listaCerv}" />
+											</p:selectOneMenu>
+											<p:commandButton for="buscarCerv" update="edCerv"
+												value="Selecionar" action="#{adminBean.selecionarCerv()}" />
+										</h:form>
+									</p:column>
+									<p:column>
+										<p:panelGrid>
+											<p:row>
+												<p:column>
+													<p:outputLabel for="nm_cervSelec" value="Nome da Cerveja"></p:outputLabel>
+												</p:column>
+												<p:column>
+													<p:inputText id="nm_cervSelec"
+														value="#{adminBean.nm_cervSelec}" maxlenght="60">
+														<f:validateLength minimum="1" maximum="60" />
+													</p:inputText>
+													<p:message for="nm_cervSelec" closable="true" />
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column>
+													<p:outputLabel for="estilo_cervSelec"
+														value="Estilo da Cerveja"></p:outputLabel>
+												</p:column>
+												<p:column>
+													<p:inputText id="estilo_cervSelec"
+														value="#{adminBean.estilo_cervSelec}" maxlenght="60">
+														<f:validateLength minimum="1" maximum="60" />
+													</p:inputText>
+													<p:message for="estilo_cervSelec" closable="true" />
+												</p:column>
+											</p:row>
+											<p:row>
+												<p:column>
+													<p:outputLabel for="teorSelec" value="Teor Alcóolico"></p:outputLabel>
+												</p:column>
+												<p:column>
+													<p:inputText id="teorSelec" value="#{adminBean.teorSelec}"
+														maxlenght="60">
+														<f:validateDoubleRange minimum="0.00" maximum="70.00" />
+													</p:inputText>
+													<p:message for="teorSelec" closable="true" />
+												</p:column>
+											</p:row>
+										</p:panelGrid>
+									</p:column>
+
+								</p:row>
+								<f:facet name="footer">
+									<p:row align="center">
+										<p:column></p:column>
+										<p:column>
+											<p:commandButton update="edCerv listCerv"
+												action="#{adminBean.editarCerv()}" value="Editar"></p:commandButton>
+
+											<p:commandButton update="edCerv listCerv"
+												action="#{adminBean.removerCerv()}" value="Remover"></p:commandButton>
+										</p:column>
+									</p:row>
+								</f:facet>
+
+							</p:panelGrid>
+						</h:form>
+					</p:column>
+
+
+
+					<p:column align="center">
+						<h:form id="edPrato">
+							<p:panelGrid style="width:50px; margin:50px">
+								<p:messages closable="true" />
+								<f:facet name="header">
+									<p:row>
+										<p:column colspan="2"> Prato		
+										</p:column>
+									</p:row>
+								</f:facet>
+								<p:row>
+									<p:column>
+										<h:form id="listPrato">
+											<p:outputLabel for="buscarPrato">Qual Prato deseja buscar?</p:outputLabel>
+											<p:selectOneMenu id="buscarPrato"
+												value="#{adminBean.idPratoSelec}" effect="fade"
+												filter="true" filterMatchMode="contains">
+												<f:selectItem itemLabel="Selecione um" itemValue="" />
+												<f:selectItems value="#{adminBean.listaPrato}" />
+											</p:selectOneMenu>
+											<p:commandButton for="buscarPrato" update="edPrato"
+												value="Selecionar" action="#{adminBean.selecionarPrato()}" />
+										</h:form>
+									</p:column>
+									<p:column>
+										<p:panelGrid>
+											<p:row>
+												<p:column>
+													<p:outputLabel for="nm_pratoSelec" value="Nome do Prato"></p:outputLabel>
+												</p:column>
+												<p:column>
+													<p:inputText id="nm_pratoSelec"
+														value="#{adminBean.nm_pratoSelec}" maxlenght="60">
+														<f:validateLength minimum="1" maximum="30" />
+													</p:inputText>
+													<p:message for="nm_pratoSelec" closable="true" />
+												</p:column>
+											</p:row>
+										</p:panelGrid>
+									</p:column>
+
+								</p:row>
+								<f:facet name="footer">
+									<p:row align="center">
+										<p:column></p:column>
+										<p:column>
+											<p:commandButton update="edPrato listPrato"
+												action="#{adminBean.editarPrato()}" value="Editar"></p:commandButton>
+
+											<p:commandButton update="edPrato listPrato"
+												action="#{adminBean.removerPrato()}" value="Remover"></p:commandButton>
+										</p:column>
+									</p:row>
+								</f:facet>
+
+							</p:panelGrid>
+						</h:form>
+					</p:column>
+
+				</p:panelGrid>
+			</div>
+			<div style="border: dashed; margin: 20px">
+				<h1 align="center">Moderação da Atividade de Usuários</h1>
+				<h:form id="edUser">
+					<p:messages closable="true" />
+					<p:panelGrid layout="grid" columns="2" style="margin:10px">
+						<f:facet name="header">
+							<p:row>
+								<p:column colspan="3"> Atividade de Usuários			
+										</p:column>
+							</p:row>
+						</f:facet>
+						<p:column style="width:10%">
+							<p:panelGrid>
+								<p:column>
+									<p:row>
+										<p:outputLabel for="buscarUser">Qual usuário deseja buscar?</p:outputLabel>
+									</p:row>
+
+									<p:row>
+										<p:selectOneMenu id="buscarUser"
+											value="#{adminBean.idUserSelec}" effect="fade" filter="true"
+											filterMatchMode="contains">
+											<f:selectItem itemLabel="Selecione um" itemValue="" />
+											<f:selectItems value="#{adminBean.listaUser}" />
+										</p:selectOneMenu>
+									</p:row>
+
+									<p:row>
+										<p:commandButton for="buscarPrato" update="edUser"
+											value="Selecionar" action="#{adminBean.selecionarUser()}" />
+									</p:row>
+								</p:column>
+							</p:panelGrid>
+						</p:column>
+						<p:column>
+							<p:panelGrid>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="username" value="Nome de Usuário"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText id="username" value="#{adminBean.username}"
+											maxlenght="20">
+											<f:validateLength minimum="1" maximum="20" />
+										</p:inputText>
+										<p:message for="username" closable="true" />
+									</p:column>
+								</p:row>
+								<p:row>
+									<p:column>
+										<p:outputLabel for="email" value="Email"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputText id="email" value="#{adminBean.email}"
+											maxlenght="50">
+											<f:validateLength minimum="1" maximum="50" />
+										</p:inputText>
+
+										<p:message for="email" closable="true" />
+									</p:column>
+
+								</p:row>
+
+								<p:row>
+									<p:column>
+										<p:outputLabel for="info" value="Informações"></p:outputLabel>
+									</p:column>
+									<p:column>
+										<p:inputTextarea id="info" value="#{adminBean.info}"
+											maxlenght="200" rows="6" columns="33" autoResize="true">
+											<f:validateLength minimum="1" maximum="200" />
+										</p:inputTextarea>
+										<p:message for="info" closable="true" />
+									</p:column>
+								</p:row>
+								<f:facet name="footer">
+									<p:row>
+										<p:column colspan="2">
+											<p:commandButton update="edUser"
+												action="#{adminBean.editarUser()}" value="Editar"></p:commandButton>
+											<p:commandButton update="edUser"
+												action="#{adminBean.removerUser()}" value="Remover"></p:commandButton>
+										</p:column>
+									</p:row>
+								</f:facet>
+							</p:panelGrid>
+						</p:column>
+					</p:panelGrid>
+					
+						
+						<p:dataGrid var="avaliacao" value="#{adminBean.listaAval}"
+							style="margin:20px" align="center">
+
+							<f:facet name="header">        
+							Avaliacoes
+						</f:facet>
+							<p:panelGrid>
+								<p:row>
+									<p:column headerText="Cerveja">
+										<h:outputText value="#{avaliacao.nm_cerv}"></h:outputText>
+									</p:column>
+									<p:column headerText="Prato">
+										<h:outputText value="#{avaliacao.nm_prato}"></h:outputText>
+									</p:column>
+									<p:column headerText="Nota">
+										<h:outputText value="#{avaliacao.nota}"></h:outputText>
+									</p:column>
+									<p:column headerText="Comentario">
+										<h:outputText value="#{avaliacao.comentario}"></h:outputText>
+									</p:column>
+									<p:column headerText="Remover">
+										<p:commandButton update="edUser"
+											action="#{adminBean.removerAval()}" 
+											title="Remover">
+											<f:setPropertyActionListener value="#{avaliacao}"
+												target="#{adminBean.avalSelec}" />
+										</p:commandButton>
+									</p:column>
+								</p:row>
+							</p:panelGrid>
+
+
+						</p:dataGrid>
+					
+
+				</h:form>
+			</div>
+
+
+
+		</ui:define>
+	</ui:composition>
+</body>
+</html>

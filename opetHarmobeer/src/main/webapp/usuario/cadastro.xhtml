@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="ISO-8859-1" ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" 
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+	xmlns:h="http://xmlns.jcp.org/jsf/html"
+	xmlns:f="http://xmlns.jcp.org/jsf/core"
+	xmlns:ui="http://java.sun.com/jsf/facelets"
+	xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1" />
+	<title>HarmoBeer</title>
+</h:head>
+<body>
+
+	<ui:composition template="/template/layout.xhtml">
+
+		<ui:define name="content">
+
+			<div align="center" style="margin: 30px">
+				<h:form id="cadastro">
+					<p:messages closable="true" />
+					<p:panelGrid>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="username" value="Nome de Usuário"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText id="username" value="#{cadastroBean.username}"
+									maxlenght="20">
+									<f:validateLength minimum="1" maximum="20" />
+								</p:inputText>
+								<p:message for="username" closable="true" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="email" value="Email"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputText id="email" value="#{cadastroBean.email}"
+									maxlenght="50">
+									<f:validateLength minimum="1" maximum="50" />
+								</p:inputText>
+
+								<p:message for="email" closable="true" />
+							</p:column>
+
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="senha" value="Senha"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:password id="senha" value="#{cadastroBean.senha}"
+									feedback="true" promptLabel="Entre com a sua senha"
+									weakLabel="Fraca" goodLabel="Boa" strongLabel="Forte"
+									match="senhaConf" maxlenght="20">
+									<f:validateLength minimum="1" maximum="20" />
+								</p:password>
+								<p:message for="senha" closable="true" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="senhaConf" value="Confirme a senha"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:password id="senhaConf" value="#{cadastroBean.senha}"
+									match="senhaConf" maxlenght="20" />
+								<p:message for="senhaConf" closable="true" />
+							</p:column>
+						</p:row>
+						<p:row>
+							<p:column>
+								<p:outputLabel for="info" value="Conte-nos mais sobre você"></p:outputLabel>
+							</p:column>
+							<p:column>
+								<p:inputTextarea id="info" value="#{cadastroBean.info}"
+									maxlenght="200" rows="6" columns="33" autoResize="true">
+									<f:validateLength minimum="1" maximum="200" />
+								</p:inputTextarea>
+								<p:message for="info" closable="true" />
+							</p:column>
+						</p:row>
+						<f:facet name="footer">
+							<p:row>
+								<p:column colspan="2">
+									<p:commandButton style="width:100%" update="cadastro"
+										action="#{cadastroBean.cadastrar()}" value="Cadastrar"></p:commandButton>
+								</p:column>
+							</p:row>
+						</f:facet>
+					</p:panelGrid>
+				</h:form>
+			</div>
+		</ui:define>
+	</ui:composition>
+
+</body>
+</html>
