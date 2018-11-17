@@ -3,17 +3,49 @@
  */
 package com.harmobeer.vo;
 
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 /**
  * Classe que modela o objeto Cerveja
  * 
  * @author Jose Carlos Soares da Cruz Junior
  */
-public class Cerveja {
+@Entity
+@Table(name = "Cerveja")
+public class Cerveja implements Serializable {
 
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence_generator")
+	@SequenceGenerator(name = "sequence_generator", sequenceName = "seqcerv")
+	@Column(name = "id_cerv") 
 	private int id_cerv;
+
+	@Column(name = "nm_cerv")
 	private String nm_cerv;
+
+	@Column(name = "nm_estilo")
 	private String nm_estilo;
-	private double teor_alcool;
+
+	@Column(name = "teor_alcoolico")
+	private double teor_alcool;	
+	
+	@OneToMany(mappedBy="cerveja", targetEntity=Harmonizacao.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<Harmonizacao> harmonizacoes;
+
 
 	/**
 	 * Construtor da classe cerveja passando o id como parametro. Utilizado para
@@ -43,9 +75,9 @@ public class Cerveja {
 	}
 
 	/**
-	 * Construtor da classe cerveja passando o nome, estilo e teor alcoolico
-	 * como parametros. Utilizado para inclusao da cerveja no banco de dados. O
-	 * parametro id eh recebido apenas no banco de dados.
+	 * Construtor da classe cerveja passando o nome, estilo e teor alcoolico como
+	 * parametros. Utilizado para inclusao da cerveja no banco de dados. O parametro
+	 * id eh recebido apenas no banco de dados.
 	 * 
 	 * @param nm_cerv
 	 * @param nm_estilo
@@ -56,11 +88,12 @@ public class Cerveja {
 		this.nm_estilo = nm_estilo;
 		this.teor_alcool = teor_alcool;
 	}
-/**
- * Construtor vazio do objeto cerveja.
- */
+
+	/**
+	 * Construtor vazio do objeto cerveja.
+	 */
 	public Cerveja() {
-		
+
 	}
 
 	/**
@@ -75,8 +108,7 @@ public class Cerveja {
 	/**
 	 * Metodo que seta o valor do id da cerveja
 	 * 
-	 * @param id_cerv
-	 *            the id_cerv to set
+	 * @param id_cerv the id_cerv to set
 	 */
 	public void setId_cerv(int id_cerv) {
 		this.id_cerv = id_cerv;
@@ -94,8 +126,7 @@ public class Cerveja {
 	/**
 	 * Metodo que seta o valor do nome da cerveja
 	 * 
-	 * @param nm_cerv
-	 *            the nm_cerv to set
+	 * @param nm_cerv the nm_cerv to set
 	 */
 	public void setNm_cerv(String nm_cerv) {
 		this.nm_cerv = nm_cerv;
@@ -113,8 +144,7 @@ public class Cerveja {
 	/**
 	 * Metodo que seta o valor do estilo da cerveja
 	 * 
-	 * @param nm_estilo
-	 *            the nm_estilo to set
+	 * @param nm_estilo the nm_estilo to set
 	 */
 	public void setNm_estilo(String nm_estilo) {
 		this.nm_estilo = nm_estilo;
@@ -132,11 +162,25 @@ public class Cerveja {
 	/**
 	 * Metodo que seta o valor do teor alcoolico da cerveja
 	 * 
-	 * @param teor_alcool
-	 *            the teor_alcool to set
+	 * @param teor_alcool the teor_alcool to set
 	 */
 	public void setTeor_alcool(double teor_alcool) {
 		this.teor_alcool = teor_alcool;
 	}
 
+	/**
+	 * @return the harmonizacoes
+	 */	
+	public List<Harmonizacao> getHarmonizacoes() {
+		return harmonizacoes;
+	}
+
+	/**
+	 * @param harmonizacoes the harmonizacoes to set
+	 */
+	public void setHarmonizacoes(List<Harmonizacao> harmonizacoes) {
+		this.harmonizacoes = harmonizacoes;
+	}
+
+	
 }

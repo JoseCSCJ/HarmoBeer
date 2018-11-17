@@ -5,8 +5,9 @@ package com.harmobeer.mvc.model;
 
 import java.util.List;
 
-import com.harmobeer.db.dao.CervejaDAO;
+import com.harmobeer.db.dao.CervejaService;
 import com.harmobeer.interfaces.ICervejaDAO;
+import com.harmobeer.util.ServiceFactory;
 import com.harmobeer.vo.Cerveja;
 
 /**
@@ -17,18 +18,20 @@ import com.harmobeer.vo.Cerveja;
  */
 public class CervejaModel implements ICervejaDAO {
 
-	private CervejaDAO cervejaDAO;
+	private CervejaService cervejaService;
+	
+	
 
 	/**
 	 * Construtor da classe Cerveja Model, utilizando a criacao de um novo
-	 * objeto da classe CervejaDAO.
+	 * objeto da classe CervejaService.
 	 */
 	public CervejaModel() {
-		cervejaDAO = new CervejaDAO();
+		this.cervejaService = ServiceFactory.getInstanceCervejaService();
 	}
 
 	/**
-	 * Metodo que inclui uma cerveja no banco, utilizando o objeto cervejaDAO
+	 * Metodo que inclui uma cerveja no banco, utilizando o objeto cervejaService
 	 * para acessar o banco
 	 * 
 	 * @param Cerveja
@@ -39,11 +42,11 @@ public class CervejaModel implements ICervejaDAO {
 	 */
 	@Override
 	public boolean incluir(Cerveja cerveja) {
-		return cervejaDAO.incluir(cerveja);
+		return cervejaService.incluir(cerveja);
 	}
 
 	/**
-	 * Metodo que edita uma cerveja no banco, utilizando o objeto cervejaDAO
+	 * Metodo que edita uma cerveja no banco, utilizando o objeto cervejaService
 	 * para acessar o banco
 	 * 
 	 * @param Cerveja
@@ -54,11 +57,11 @@ public class CervejaModel implements ICervejaDAO {
 
 	@Override
 	public boolean editar(Cerveja cerveja) {
-		return cervejaDAO.editar(cerveja);
+		return cervejaService.editar(cerveja);
 	}
 
 	/**
-	 * Metodo que exclui uma cerveja no banco, utilizando o objeto cervejaDAO
+	 * Metodo que exclui uma cerveja no banco, utilizando o objeto cervejaService
 	 * para acessar o banco
 	 * 
 	 * @param Cerveja
@@ -69,7 +72,7 @@ public class CervejaModel implements ICervejaDAO {
 
 	@Override
 	public boolean deletar(Cerveja cerveja) {
-		return cervejaDAO.deletar(cerveja);
+		return cervejaService.deletar(cerveja);
 	}
 
 	/**
@@ -78,12 +81,13 @@ public class CervejaModel implements ICervejaDAO {
 	 * 
 	 * @return ArrayList com os objetos da Classe Cerveja gerados com os dados
 	 *         recebidos do banco de dados.
+	 * @throws Exception 
 	 * 
 	 */
 
 	@Override
-	public List<Cerveja> listarTodos() {
-		return cervejaDAO.listarTodos();
+	public List<Cerveja> listarTodos() throws Exception {
+		return cervejaService.listarTodos();
 	}
 
 	/**
@@ -93,23 +97,13 @@ public class CervejaModel implements ICervejaDAO {
 	 * @param id
 	 *            ID da cerveja cadastrada no banco
 	 * @return Cerveja selecionada
+	 * @throws Exception 
 	 */
 
-	public Cerveja selecionarCerv(int id) {
-		return cervejaDAO.selecionarCerv(id);
+	public Cerveja selecionarCerv(int id) throws Exception {
+		return cervejaService.selecionarCerv(id);
 	}
 
-	/**
-	 * Metodo responsavel por buscar cerveja que contem uma determinada string
-	 * em seu nome.
-	 * 
-	 * @param String
-	 *            busca
-	 * @return List<Cerveja> com cervejas que contenham busca
-	 */
-	@Override
-	public List<Cerveja> buscarCerv(String busca) {
-		return cervejaDAO.buscarCerv(busca);
-	}
+	
 
 }

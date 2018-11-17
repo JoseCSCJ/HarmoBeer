@@ -3,13 +3,14 @@
  */
 package com.harmobeer.db.dao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import com.harmobeer.interfaces.IPratoDAO;
 import com.harmobeer.vo.Prato;
@@ -18,344 +19,174 @@ import com.harmobeer.vo.Prato;
  *
  * Classe responsavel pelo acesso ao banco de dados do objeto prato
  *
- * @author Jose Carlos Soares da Cruz Junior 
+ * @author Jose Carlos Soares da Cruz Junior
  *
  */
 public class PratoDAO implements IPratoDAO {
 
-	private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
-	private static final String LOCAL_HOST = "jdbc:oracle:thin:@//localhost:1521/xe";
-	private static final String DB_USER = "harmobeer";
-	private static final String DB_PASSWORD = "harmobeer";
-	private static final String ERRO = "Nao foi possivel completar sua requisicao.";
+	private Session session;
+
+	// Construtor
+	public PratoDAO() {
+
+	}
 
 	/**
 	 * Metodo responsavel por realizar a inclusao de pratos no banco.
 	 *
-	 * @param Prato
-	 *            prato a ser incluido
-	 * @return boolean true para transacao bem sucedida e false para
-	 *         transacao interrompida.
+	 * @param Prato prato a ser incluido
+	 * @return boolean true para transacao bem sucedida e false para transacao
+	 *         interrompida.
 	 *
 	 */
 	@Override
 	public boolean incluir(Prato prato) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
+		Transaction transaction = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("insert into prato(id_prato, nm_prato) values(seqprato.nextval,?)");
-			sttm.setString(1, prato.getNm_prato());
-
-			sttm.executeUpdate();
+			transaction = this.session.beginTransaction();
+			this.session.save(prato);
+			this.session.flush();
+			transaction.commit();
 			return true;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
 			e.printStackTrace();
 			return false;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
-
 	}
 
 	/**
-	 * Metodo responsavel por realizar a edicao de Pratos cadastrados no
-	 * banco.
+	 * Metodo responsavel por realizar a edicao de Pratos cadastrados no banco.
 	 *
-	 * @param Prato
-	 *            prato a ser editado
-	 * @return boolean true para transacao bem sucedida e false para
-	 *         transacao interrompida.
+	 * @param Prato prato a ser editado
+	 * @return boolean true para transacao bem sucedida e false para transacao
+	 *         interrompida.
 	 */
 	@Override
 	public boolean editar(Prato prato) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
+		Transaction transaction = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("UPDATE prato SET nm_prato = ? where id_prato = ?");
-			sttm.setString(1, prato.getNm_prato());
-			sttm.setInt(2, prato.getId_prato());
-
-			sttm.executeUpdate();
+			transaction = this.session.beginTransaction();
+			this.session.merge(prato);
+			this.session.flush();
+			transaction.commit();
 			return true;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
 			e.printStackTrace();
 			return false;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
-
 	}
 
 	/**
-	 * Metodo responsavel por realizar a exclusao de Pratos cadastrados no
-	 * banco
+	 * Metodo responsavel por realizar a exclusao de Pratos cadastrados no banco
 	 *
-	 * @param Prato
-	 *            prato a deletado
-	 * @return boolean true para transacao bem sucedida e false para
-	 *         transacao interrompida.
+	 * @param Prato prato a deletado
+	 * @return boolean true para transacao bem sucedida e false para transacao
+	 *         interrompida.
 	 */
 	@Override
 	public boolean deletar(Prato prato) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
-		PreparedStatement sttmHarmo = null;
+		Transaction transaction = null;
 		try {
-			Class.forName(JDBC_DRIVER);
+			int id = prato.getId_prato();
+			transaction = this.session.beginTransaction();
+			this.session.clear();
+			this.session.delete(prato);
+			this.session.flush();
+			transaction.commit();
+			try {
+				prato = selecionarPrato(id);
+			} catch (Exception e) {
+				System.out.println("Erro na validação da deleção");
+				e.printStackTrace();
+				return false;
+			}
+			if (prato == null) {
 
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-			sttmHarmo = connection.prepareStatement("select id_harmo from harmonizacao where id_prato=?");
-			sttmHarmo.setInt(1, prato.getId_prato());
-			ResultSet rs = sttmHarmo.executeQuery();
-			while (rs.next()) {
-				int id_harmo = rs.getInt("id_harmo");
-				sttm = connection.prepareStatement("DELETE from avaliacao where id_harmo = ?");
-				sttm.setInt(1, id_harmo);
-				sttm.executeUpdate();
-				if (sttm != null) {
-					sttm.close();
-				}
-			}
-			if (sttmHarmo != null) {
-				sttmHarmo.close();
-			}
-			if (sttm != null) {
-				sttm.close();
-			}
-			sttm = connection.prepareStatement("DELETE from harmonizacao where id_prato = ?");
-			sttm.setInt(1, prato.getId_prato());
-			sttm.executeUpdate();
-			if (sttm != null) {
-				sttm.close();
+				return true;
+
+			} else {
+
+				return false;
 			}
 
-			sttm = connection.prepareStatement("DELETE from prato where id_prato = ?");
-			sttm.setInt(1, prato.getId_prato());
-			sttm.executeUpdate();
-			return true;
-
-		} catch (
-
-		ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
 			e.printStackTrace();
 			return false;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
-
 	}
 
 	/**
-	 * Metodo responsavel por realizar a listagem de todas os Pratos
-	 * cadastrados no banco.
+	 * Metodo responsavel por realizar a listagem de todas os Pratos cadastrados no
+	 * banco.
 	 *
 	 * @return ArrayList com os objetos da Classe Prato gerados com os dados
 	 *         recebidos do banco de dados.
 	 *
 	 */
+	@SuppressWarnings("unchecked")
 	@Override
-	public List<Prato> listarTodos() {
-		ArrayList<Prato> listaPrato = new ArrayList<Prato>();
-		Connection connection = null;
-		PreparedStatement sttm = null;
+	public List<Prato> listarTodos() throws Exception {
+
+		List<Prato> pratos = null;
+		Criteria criteria = null;
+
 		try {
-			Class.forName(JDBC_DRIVER);
 
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
+			criteria = this.session.createCriteria(Prato.class).addOrder(Order.asc("nm_prato"));
+			pratos = (List<Prato>) criteria.list();
+			return pratos;
 
-			sttm = connection.prepareStatement("select * from prato");
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_prato = rs.getInt("id_prato");
-				String nm_prato = rs.getString("nm_prato");
-
-				Prato prato = new Prato(id_prato, nm_prato);
-
-				listaPrato.add(prato);
-			}
-
-			return listaPrato;
-
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
 
 	}
 
 	/**
-	 * Metodo responsavel por buscar e retornar um objeto da classe Prato no
-	 * banco
+	 * Metodo responsavel por buscar e retornar um objeto da classe Prato no banco
 	 *
-	 * @param id
-	 *            ID da prato cadastrada no banco
+	 * @param id ID da prato cadastrada no banco
 	 * @return Prato selecionada
 	 */
-	public Prato selecionarPrato(int id) {
-		Prato prato = new Prato(id);
-		Connection connection = null;
-		PreparedStatement sttm = null;
+	@Override
+	public Prato selecionarPrato(int id) throws Exception {
+		Prato prato = null;
+		Criteria criteria = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select * from prato where id_prato = ?");
-			sttm.setInt(1, id);
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				prato.setNm_prato(rs.getString("nm_prato"));
-
-			}
+			criteria = this.session.createCriteria(Prato.class).add(Restrictions.eq("id_prato", id));
+			prato = (Prato) criteria.uniqueResult();
 			return prato;
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
 	}
 
 	/**
-	 * Metodo responsavel por buscar e retornar uma lista de pratos que contem
-	 * uma string pre-determinada.
-	 *
-	 * @param String
-	 *            busca
-	 * @return List<Prato> com pratos que contem busca
+	 * @return the session
 	 */
-	@Override
-	public List<Prato> buscarPrato(String busca) {
-		ArrayList<Prato> listaPrato = new ArrayList<Prato>();
-		Connection connection = null;
-		PreparedStatement sttm = null;
-		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select * from prato where regexp_like(nm_prato, '"+ busca+"', 'i')");
-
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_prato = rs.getInt("id_prato");
-				String nm_prato = rs.getString("nm_prato");
-
-				Prato prato = new Prato(id_prato, nm_prato);
-
-				listaPrato.add(prato);
-			}
-
-			return listaPrato;
-
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
-			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
+	public Session getSession() {
+		return session;
 	}
+
+	/**
+	 * @param session the session to set
+	 */
+	public void setSession(Session session) {
+		this.session = session;
+	}
+
 }

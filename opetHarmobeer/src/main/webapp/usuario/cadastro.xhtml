@@ -39,8 +39,11 @@
 							</p:column>
 							<p:column>
 								<p:inputText id="email" value="#{cadastroBean.email}"
-									maxlenght="50">
+									maxlenght="50"
+									validatorMessage="#{cadastroBean.email} não é uma opção válida">
 									<f:validateLength minimum="1" maximum="50" />
+									<f:validateRegex
+										pattern="([^.@]+)(\.[^.@]+)*@([^.@]+\.)+([^.@]+)" />
 								</p:inputText>
 
 								<p:message for="email" closable="true" />

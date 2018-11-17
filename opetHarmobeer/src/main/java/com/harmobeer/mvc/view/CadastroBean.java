@@ -1,3 +1,5 @@
+package com.harmobeer.mvc.view;
+
 import java.io.Serializable;
 
 import javax.enterprise.context.RequestScoped;
@@ -38,12 +40,12 @@ public class CadastroBean implements Serializable {
 				Util.mensagemInfo("Usuario cadastrado com sucesso! Tente logar para começar suas avaliações");
 			} else {
 				Util.mensagemErro(
-						"Algo de errado aconteceu. Verifique se todos os dados foram inseridos corretamente e tente novamente.");
+						"Algo de errado aconteceu. Verifique se todos os dados foram inseridos corretamente e tente novamente. Talvez esse usuário já esteja cadastrado.");
 			}
 
 		} catch (Exception e) {
 			Util.mensagemErro(
-					"Algo de errado aconteceu. Verifique se todos os dados foram inseridos corretamente e tente novamente.");
+					"Algo de errado aconteceu. Verifique se todos os dados foram inseridos corretamente e tente novamente.Talvez esse usuário já esteja cadastrado.");
 			e.printStackTrace();
 		}
 	}

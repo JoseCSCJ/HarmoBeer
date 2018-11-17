@@ -3,98 +3,73 @@
  */
 package com.harmobeer.vo;
 
-/** 
+import java.io.Serializable;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
+/**
  * Classe que modela o objeto Avaliacao
  * 
- * @author Jose Carlos Soares da Cruz Junior 
+ * @author Jose Carlos Soares da Cruz Junior
  */
-public class Avaliacao {
-	
+
+@Entity
+@Table(name = "Avaliacao")
+public class Avaliacao implements Serializable {
+
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence_generator")
+	@SequenceGenerator(name = "sequence_generator", sequenceName = "seqaval")
+	@Column(name = "id_aval")
 	private int id_aval;
-	private int id_harmo;
-	private String nm_cerv;
-	private String nm_prato;
-	private int id_user;
-	private String username;
+
+	@ManyToOne
+	@JoinColumn(name = "id_harmo")
+	private Harmonizacao harmonizacao;
+
+	@ManyToOne
+	@JoinColumn(name = "id_user")
+	private Usuario user;
+
+	@Column(name = "nota")
 	private int nota;
+
+	@Column(name = "comentario")
 	private String comentario;
-	
+
 	/**
 	 * @param id_aval
-	 
+	 * 
 	 */
 	public Avaliacao(int id_aval) {
 		this.id_aval = id_aval;
-		
-	}
-	/**
-	 * @param id_aval
-	 * @param id_harmo
-	 * @param nm_cerv
-	 * @param nm_prato
-	 * @param id_user
-	 * @param username
-	 * @param nota
-	 * @param comentario
-	 */
-	public Avaliacao(int id_aval, int id_harmo, String nm_cerv, String nm_prato, int id_user, String username, int nota,
-			String comentario) {
-		this.id_aval = id_aval;
-		this.id_harmo = id_harmo;
-		this.nm_cerv = nm_cerv;
-		this.nm_prato = nm_prato;
-		this.id_user = id_user;
-		this.username = username;
-		this.nota = nota;
-		this.comentario = comentario;
-	}
-	/**
-	 * @param id_aval
-	 * @param id_user
-	 * @param username
-	 * @param nota
-	 * @param comentario
-	 */
-	public Avaliacao(int id_aval, int id_user, String username, int nota, String comentario) {
-		this.id_aval = id_aval;			
-		this.id_user = id_user;
-		this.username = username;
-		this.nota = nota;
-		this.comentario = comentario;
-	}
 
-
-	
+	}
 	
 	/**
 	 * @param id_aval
-	 * @param id_harmo
-	 * @param id_user
+	 * @param harmonizacao
+	 * @param user
 	 * @param nota
 	 * @param comentario
 	 */
-	public Avaliacao(int id_aval, int id_harmo, int id_user, int nota, String comentario) {
-		this.id_aval = id_aval;
-		this.id_harmo = id_harmo;
-		this.id_user = id_user;
-		this.nota = nota;
-		this.comentario = comentario;
+	public Avaliacao (int id_aval, Harmonizacao harmonizacao, Usuario user, int nota, String comentario) {
+		this.id_aval=id_aval;
+		this.harmonizacao=harmonizacao;
+		this.user=user;
+		this.nota=nota;
+		this.comentario=comentario;
 	}
-	
-	
-	/**
-	 * @param id_harmo
-	 * @param id_user
-	 * @param nota
-	 * @param comentario
-	 */
-	public Avaliacao(int id_harmo, int id_user, int nota, String comentario) {
-		this.id_harmo = id_harmo;
-		this.id_user = id_user;
-		this.nota = nota;
-		this.comentario = comentario;
-	}
-
 
 	/**
 	 * @param nota
@@ -104,13 +79,26 @@ public class Avaliacao {
 		this.nota = nota;
 		this.comentario = comentario;
 	}
+
 	/**
 	 * Construtor vazio para avaliacao
 	 */
 	public Avaliacao() {
-		
+
 	}
 
+	/**
+	 * @param harmonizacao
+	 * @param user
+	 * @param nota
+	 * @param comentario
+	 */
+	public Avaliacao(Harmonizacao harmonizacao, Usuario user, int nota, String comentario) {		
+		this.harmonizacao=harmonizacao;
+		this.user=user;
+		this.nota=nota;
+		this.comentario=comentario;
+	}
 
 	/**
 	 * @return the id_aval
@@ -118,54 +106,35 @@ public class Avaliacao {
 	public int getId_aval() {
 		return id_aval;
 	}
+
 	/**
 	 * @param id_aval the id_aval to set
 	 */
 	public void setId_aval(int id_aval) {
 		this.id_aval = id_aval;
 	}
-	/**
-	 * @return the id_harmo
-	 */
-	public int getId_harmo() {
-		return id_harmo;
-	}
-	/**
-	 * @param id_harmo the id_harmo to set
-	 */
-	public void setId_harmo(int id_harmo) {
-		this.id_harmo = id_harmo;
-	}
-	/**
-	 * @return the id_user
-	 */
-	public int getId_user() {
-		return id_user;
-	}
-	/**
-	 * @param id_user the id_user to set
-	 */
-	public void setId_user(int id_user) {
-		this.id_user = id_user;
-	}
+
 	/**
 	 * @return the nota
 	 */
 	public int getNota() {
 		return nota;
 	}
+
 	/**
 	 * @param nota the nota to set
 	 */
 	public void setNota(int nota) {
 		this.nota = nota;
 	}
+
 	/**
 	 * @return the comentario
 	 */
 	public String getComentario() {
 		return comentario;
 	}
+
 	/**
 	 * @param comentario the comentario to set
 	 */
@@ -173,53 +142,32 @@ public class Avaliacao {
 		this.comentario = comentario;
 	}
 
-
 	/**
-	 * @return the nm_cerv
+	 * @return the harmonizacao
 	 */
-	public String getNm_cerv() {
-		return nm_cerv;
+	public Harmonizacao getHarmonizacao() {
+		return harmonizacao;
 	}
 
-
 	/**
-	 * @param nm_cerv the nm_cerv to set
+	 * @param harmonizacao the harmonizacao to set
 	 */
-	public void setNm_cerv(String nm_cerv) {
-		this.nm_cerv = nm_cerv;
+	public void setHarmonizacao(Harmonizacao harmonizacao) {
+		this.harmonizacao = harmonizacao;
 	}
 
-
 	/**
-	 * @return the nm_prato
+	 * @return the user
 	 */
-	public String getNm_prato() {
-		return nm_prato;
+	public Usuario getUser() {
+		return user;
 	}
 
-
 	/**
-	 * @param nm_prato the nm_prato to set
+	 * @param user the user to set
 	 */
-	public void setNm_prato(String nm_prato) {
-		this.nm_prato = nm_prato;
+	public void setUser(Usuario user) {
+		this.user = user;
 	}
-
-
-	/**
-	 * @return the username
-	 */
-	public String getUsername() {
-		return username;
-	}
-
-
-	/**
-	 * @param username the username to set
-	 */
-	public void setUsername(String username) {
-		this.username = username;
-	}
-	
 
 }

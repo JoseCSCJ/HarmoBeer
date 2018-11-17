@@ -88,10 +88,11 @@ public class CervejaController implements ICervejaDAO {
 	 * 
 	 * @return ArrayList com os objetos da Classe Cerveja gerados com os dados
 	 *         recebidos do banco de dados.
+	 * @throws Exception 
 	 * 
 	 */
 	@Override
-	public List<Cerveja> listarTodos() {
+	public List<Cerveja> listarTodos() throws Exception {
 		return cervejaModel.listarTodos();
 	}
 
@@ -102,23 +103,12 @@ public class CervejaController implements ICervejaDAO {
 	 * @param id
 	 *            ID da cerveja cadastrada no banco
 	 * @return Cerveja selecionada
+	 * @throws Exception 
 	 */
-	public Cerveja selecionarCerveja(int id) {
+	public Cerveja selecionarCerv(int id) throws Exception {
 		return cervejaModel.selecionarCerv(id);
 	}
-
-	/**
-	 * Metodo responsavel por buscar cerveja que contem uma determinada string
-	 * em seu nome.
-	 * 
-	 * @param String
-	 *            busca
-	 * @return List<Cerveja> com cervejas que contenham busca
-	 */
-	@Override
-	public List<Cerveja> buscarCerv(String busca) {
-		return cervejaModel.buscarCerv(busca);
-	}
+	
 
 	/**
 	 * Metodo responsavel por validar o objeto cerveja, garantindo que seus

@@ -5,7 +5,9 @@ package com.harmobeer.mvc.model;
 
 import java.util.ArrayList;
 
-import com.harmobeer.db.dao.HarmonizacaoDAO;
+import com.harmobeer.db.dao.HarmonizacaoService;
+import com.harmobeer.interfaces.IHarmonizacaoDAO;
+import com.harmobeer.util.ServiceFactory;
 import com.harmobeer.vo.Cerveja;
 import com.harmobeer.vo.Harmonizacao;
 import com.harmobeer.vo.Prato;
@@ -17,15 +19,15 @@ import com.harmobeer.vo.Prato;
  * @author Jose Carlos Soares da Cruz Junior 
  *
  */
-public class HarmonizacaoModel {
-	private HarmonizacaoDAO harmonizacaoDAO;
+public class HarmonizacaoModel implements IHarmonizacaoDAO {
+	private HarmonizacaoService harmonizacaoService ;
 
 	/**
 	 * Construtor da classe HarmonizacaoModel utilizando a classe
-	 * HarmonizacaoDAO
+	 * HarmonizacaoService
 	 */
 	public HarmonizacaoModel() {
-		harmonizacaoDAO = new HarmonizacaoDAO();
+		this.harmonizacaoService = ServiceFactory.getInstanceHarmonizacaoService();
 	}
 
 	/**
@@ -37,7 +39,7 @@ public class HarmonizacaoModel {
 	 * @return boolean
 	 */
 	public boolean incluirHarmonizacao(Cerveja cerveja, Prato prato) {
-		return harmonizacaoDAO.incluirHarmonizacao(cerveja, prato);
+		return harmonizacaoService.incluirHarmonizacao(cerveja, prato);
 	}
 
 	/**
@@ -48,7 +50,7 @@ public class HarmonizacaoModel {
 	 * @return boolean
 	 */
 	public boolean calcularMedia(Harmonizacao harmo) {
-		return harmonizacaoDAO.calcularMedia(harmo);
+		return harmonizacaoService.calcularMedia(harmo);
 	}
 
 	/**
@@ -58,9 +60,10 @@ public class HarmonizacaoModel {
 	 * @param cerveja
 	 * @return ArrayList<Harmonizacao> em ordem decrescente das harmonizacoes
 	 *         pela media
+	 * @throws Exception 
 	 */
-	public ArrayList<Harmonizacao> gerarRanking(Cerveja cerveja) {
-		return harmonizacaoDAO.gerarRanking(cerveja);
+	public ArrayList<Harmonizacao> gerarRanking(Cerveja cerveja) throws Exception {
+		return harmonizacaoService.gerarRanking(cerveja);
 	}
 
 	/**
@@ -70,33 +73,37 @@ public class HarmonizacaoModel {
 	 * @param cerveja
 	 * @return ArrayList<Harmonizacao> em ordem decrescente das harmonizacoes
 	 *         pela media
+	 * @throws Exception 
 	 */
-	public ArrayList<Harmonizacao> gerarRanking(Prato prato) {
-		return harmonizacaoDAO.gerarRanking(prato);
+	public ArrayList<Harmonizacao> gerarRanking(Prato prato) throws Exception {
+		return harmonizacaoService.gerarRanking(prato);
 	}
 	/**
 	 * Método que devolve a id de uma harmonização com base na cerveja e no prato
 	 * @param cerveja
 	 * @param prato
 	 * @return int id_harmo
+	 * @throws Exception 
 	 */
-	public int selecionaridHarmonizacao(Cerveja cerveja, Prato prato) {
-		return harmonizacaoDAO.selecionaridHarmonizacao(cerveja, prato);
+	public int selecionaridHarmonizacao(Cerveja cerveja, Prato prato) throws Exception {
+		return harmonizacaoService.selecionaridHarmonizacao(cerveja, prato);
 	}
 	/**
 	 * Metodo para selecionar uma harmonizacao no banco de dados
 	 * @param id_harmo
 	 * @return objeto harmonizacao 
+	 * @throws Exception 
 	 */
-	public Harmonizacao selecionarHarmo(int id_harmo) {
-		return harmonizacaoDAO.selecionarHarmo(id_harmo);
+	public Harmonizacao selecionarHarmo(int id_harmo) throws Exception {
+		return harmonizacaoService.selecionarHarmo(id_harmo);
 	}
 	/**
 	 * Metodo que devolve uma ArrayList com toda as harmonizacoes cadastradas.
 	 * @return ArrayList com todas as harmonizacoes
+	 * @throws Exception 
 	 */
-	public ArrayList<Harmonizacao> listarTodos() {
-		return harmonizacaoDAO.listarTodos();
+	public ArrayList<Harmonizacao> listarTodos() throws Exception {
+		return harmonizacaoService.listarTodos();
 	}
 	
 }

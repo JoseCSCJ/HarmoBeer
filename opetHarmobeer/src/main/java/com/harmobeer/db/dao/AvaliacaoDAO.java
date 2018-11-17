@@ -3,30 +3,31 @@
  */
 package com.harmobeer.db.dao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
+
+import com.harmobeer.interfaces.IAvaliacaoDAO;
 import com.harmobeer.vo.Avaliacao;
-import com.harmobeer.vo.Harmonizacao;
-import com.harmobeer.vo.Usuario;
+
 
 /**
  * Classe responsavel pelo acesso ao banco de dados para Avaliacao
  *
- * @author Jose Carlos Soares da Cruz Junior 
+ * @author Jose Carlos Soares da Cruz Junior
  *
  */
-public class AvaliacaoDAO {
-	private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
-	private static final String LOCAL_HOST = "jdbc:oracle:thin:@//localhost:1521/xe";
-	private static final String DB_USER = "harmobeer";
-	private static final String DB_PASSWORD = "harmobeer";
-	private static final String ERRO = "Nao foi possivel completar sua requisicao.";
+public class AvaliacaoDAO implements IAvaliacaoDAO {
+
+	private Session session;
 
 	/**
 	 * 
@@ -38,46 +39,23 @@ public class AvaliacaoDAO {
 	 * @param harmo
 	 * @return boolean
 	 */
-	public boolean incluirAvaliacao(Avaliacao aval, Usuario user, Harmonizacao harmo) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
-
+	public boolean incluirAvaliacao(Avaliacao aval) {
+		Transaction transaction = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement(
-					"insert into avaliacao(id_aval,id_user, id_harmo, nota, comentario) values (seqaval.nextval,?,?,?,?)");
-			sttm.setInt(1, user.getId_user());
-			sttm.setInt(2, harmo.getId_harmo());
-			sttm.setInt(3, aval.getNota());
-			sttm.setString(4, aval.getComentario());
-
-			sttm.executeUpdate();
-
+			transaction = this.session.beginTransaction();
+			this.session.save(aval);
+			this.session.flush();
+			transaction.commit();
 			return true;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
 			e.printStackTrace();
 			return false;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
+
 	}
 
 	/**
@@ -87,42 +65,20 @@ public class AvaliacaoDAO {
 	 * @return boolean
 	 */
 	public boolean editarAvaliacao(Avaliacao aval) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
-
+		Transaction transaction = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("UPDATE avaliacao set nota=?, comentario=? where id_aval=?");
-			sttm.setInt(1, aval.getNota());
-			sttm.setString(2, aval.getComentario());
-			sttm.setInt(3, aval.getId_aval());
-
-			sttm.executeUpdate();
-
+			transaction = this.session.beginTransaction();
+			this.session.merge(aval);
+			this.session.flush();
+			transaction.commit();
 			return true;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
 			e.printStackTrace();
 			return false;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -133,36 +89,21 @@ public class AvaliacaoDAO {
 	 * @return boolean
 	 */
 	public boolean deletarAvaliacao(Avaliacao aval) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
+		Transaction transaction = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-			sttm = connection.prepareStatement("DELETE from avaliacao where id_aval = ?");
-			sttm.setInt(1, aval.getId_aval());
-			sttm.executeUpdate();
+			transaction = this.session.beginTransaction();
+			this.session.clear();
+			this.session.delete(aval);
+			this.session.flush();
+			transaction.commit();
 			return true;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
 			e.printStackTrace();
 			return false;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -173,52 +114,25 @@ public class AvaliacaoDAO {
 	 * @param idUser
 	 * @return List<Avaliacao>
 	 */
-	public List<Avaliacao> listarAvalporUser(int idUser) {
+	@SuppressWarnings("unchecked")
+	public List<Avaliacao> listarAvalporUser(int idUser) throws Exception {
 		ArrayList<Avaliacao> listaAval = new ArrayList<Avaliacao>();
-		Connection connection = null;
-		PreparedStatement sttm = null;
+		Criteria criteria = null;
+
 		try {
-			Class.forName(JDBC_DRIVER);
+			criteria = this.session.createCriteria(Avaliacao.class).createAlias("user", "u")
+					.add(Restrictions.eq("u.id_user", idUser));
 
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select * from avaliacao where id_user = ?");
-			sttm.setInt(1, idUser);
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_aval = rs.getInt("id_aval");
-				int id_harmo = rs.getInt("id_harmo");
-				int nota = rs.getInt("nota");
-				String comentario = rs.getString("comentario");
-
-				Avaliacao aval = new Avaliacao(id_aval, id_harmo, idUser, nota, comentario);
-
-				listaAval.add(aval);
-			}
+			listaAval = (ArrayList<Avaliacao>) criteria.list();
 
 			return listaAval;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException he) {
+			he.printStackTrace();
+			throw new Exception();
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
 
 	}
@@ -230,53 +144,25 @@ public class AvaliacaoDAO {
 	 * @param idUser
 	 * @return List<Avaliacao>
 	 */
-	public List<Avaliacao> listarAvalporHarmo(int idHarmo) {
+	@SuppressWarnings("unchecked")
+	public List<Avaliacao> listarAvalporHarmo(int idHarmo) throws Exception {
 		ArrayList<Avaliacao> listaAval = new ArrayList<Avaliacao>();
-		Connection connection = null;
-		PreparedStatement sttm = null;
+		Criteria criteria = null;
 
 		try {
-			Class.forName(JDBC_DRIVER);
+			criteria = this.session.createCriteria(Avaliacao.class).createAlias("harmonizacao", "h")
+					.add(Restrictions.eq("h.id_harmo", idHarmo));
 
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select * from avaliacao where id_harmo = ?");
-			sttm.setInt(1, idHarmo);
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_aval = rs.getInt("id_aval");
-				int id_user = rs.getInt("id_user");
-				int nota = rs.getInt("nota");
-				String comentario = rs.getString("comentario");
-
-				Avaliacao aval = new Avaliacao(id_aval, idHarmo, id_user, nota, comentario);
-
-				listaAval.add(aval);
-			}
+			listaAval = (ArrayList<Avaliacao>) criteria.list();
 
 			return listaAval;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException he) {
+			he.printStackTrace();
+			throw new Exception();
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
 
 	}
@@ -285,98 +171,64 @@ public class AvaliacaoDAO {
 	 * Metodo responsavel por buscar e retornar um objeto da classe Avaliacao no
 	 * banco
 	 *
-	 * @param id
-	 *            ID da avaliacao cadastrada no banco
+	 * @param id ID da avaliacao cadastrada no banco
 	 * @return Avaliacao selecionada
 	 */
-	public Avaliacao selecionarAval(int id) {
-		Avaliacao aval = new Avaliacao(id);
-		Connection connection = null;
-		PreparedStatement sttm = null;
+	public Avaliacao selecionarAval(int id) throws Exception {
+		Avaliacao avaliacao = null;
+		Criteria criteria = null;
 		try {
-			Class.forName(JDBC_DRIVER);
+			criteria = this.session.createCriteria(Avaliacao.class).add(Restrictions.eq("id_aval", id));
 
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
+			avaliacao = (Avaliacao) criteria.uniqueResult();
+			return avaliacao;
 
-			sttm = connection.prepareStatement("select * from avaliacao where id_aval = ?");
-			sttm.setInt(1, id);
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				aval.setId_user(rs.getInt("id_user"));
-				aval.setId_harmo(rs.getInt("id_harmo"));
-				aval.setNota(rs.getInt("nota"));
-				aval.setComentario(rs.getString("comentario"));
-
-			}
-			return aval;
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException he) {
+			he.printStackTrace();
+			throw new Exception();
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
+
 	}
+
 	/**
-	 * Metodo responsavel por buscar e retornar o último objeto gerado da classe Avaliacao no
-	 * banco
+	 * Metodo responsavel por buscar e retornar o último objeto gerado da classe
+	 * Avaliacao no banco
 	 *
 	 * @return int id Ultima Avaliacao criada
 	 */
-	public int selecionarUltAval() {
-		int id = 0;
-		Connection connection = null;
-		PreparedStatement sttm = null;
-		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select MAX(id_aval) from avaliacao");
-			
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-				
-				id = rs.getInt(1);				
-
-			}
-			return id;
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
-			e.printStackTrace();
-			return id;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return id;
-		} finally {
+	public Avaliacao selecionarUltAval() throws Exception {
+		Criteria criteria = null;
+		Avaliacao avaliacao = null;
 			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+				DetachedCriteria idMax= DetachedCriteria.forClass(Avaliacao.class).setProjection(Projections.max("id_aval"));
+				criteria=this.session.createCriteria(Avaliacao.class).add(Property.forName("id_aval").eq(idMax));
+				avaliacao = (Avaliacao) criteria.uniqueResult();
+				return avaliacao;
+
+		} catch (HibernateException he) {
+			he.printStackTrace();
+			throw new Exception();
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
 		}
+	}
+
+	/**
+	 * @return the session
+	 */
+	public Session getSession() {
+		return session;
+	}
+
+	/**
+	 * @param session the session to set
+	 */
+	public void setSession(Session session) {
+		this.session = session;
 	}
 
 }

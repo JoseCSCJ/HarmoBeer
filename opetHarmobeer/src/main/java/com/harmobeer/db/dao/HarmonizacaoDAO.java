@@ -3,13 +3,17 @@
  */
 package com.harmobeer.db.dao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
+
+import com.harmobeer.interfaces.IHarmonizacaoDAO;
+import com.harmobeer.vo.Avaliacao;
 import com.harmobeer.vo.Cerveja;
 import com.harmobeer.vo.Harmonizacao;
 import com.harmobeer.vo.Prato;
@@ -18,147 +22,89 @@ import com.harmobeer.vo.Prato;
  *
  * Classe de acesso ao banco de dados da classe Harmonizacao.
  *
- * @author Jose Carlos Soares da Cruz Junior 
+ * @author Jose Carlos Soares da Cruz Junior
  *
  */
 
-public class HarmonizacaoDAO {
+public class HarmonizacaoDAO implements IHarmonizacaoDAO {
 
-	private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
-	private static final String LOCAL_HOST = "jdbc:oracle:thin:@//localhost:1521/xe";
-	private static final String DB_USER = "harmobeer";
-	private static final String DB_PASSWORD = "harmobeer";
-	private static final String ERRO = "Nao foi possivel completar sua requisicao.";
+	private Session session;
 
-	/**
-	 * Metodo que verifica se a harmonizacao de uma cerveja com um prato ja
-	 * existe no banco de dados. Caso exista, retorna a ID da harmonizacao do
-	 * banco de dados. Caso nÃ£o exista, retorna o valor -1. Caso haja algum
-	 * erro de verificacao no banco, retorna -2.
-	 *
-	 * @param cerveja
-	 * @param prato
-	 * @return int
-	 */
+	public HarmonizacaoDAO() {
 
-	private int verificarHarmonizacao(Cerveja cerveja, Prato prato) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
-		ResultSet rs = null;
-		boolean verificarCerveja = false;
-		boolean verificarPrato = false;
-		int idHarmo = -1;
-		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select p.id_prato, c.id_cerv, h.id_harmo from harmonizacao h "
-					+ "left join prato p on p.id_prato = h.id_prato " + "left join cerveja c on c.id_cerv = h.id_cerv");
-			rs = sttm.executeQuery();
-			while (rs.next()) {
-				verificarPrato = false;
-				verificarCerveja = false;
-				if (rs.getInt("id_prato") == prato.getId_prato()) {
-					verificarPrato = true;
-				} else {
-					verificarPrato = false;
-				}
-				if (rs.getInt("id_cerv") == cerveja.getId_cerv()) {
-					verificarCerveja = true;
-				} else {
-					verificarCerveja = false;
-				}
-				if (verificarPrato == true && verificarCerveja == true) {
-					idHarmo = rs.getInt("id_harmo");
-					return idHarmo;
-				}
-			}
-
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
-			e.printStackTrace();
-			return -2;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return -2;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return -2;
-			}
-		}
-		return idHarmo;
 	}
 
 	/**
-	 * Metodo que inclui uma harmonizacao no banco de dados caso ela ja nao
-	 * exista.
+	 * Metodo que verifica se a harmonizacao de uma cerveja com um prato ja existe
+	 * no banco de dados. Caso exista, retorna boolean true. Caso não exista retorna
+	 * false. Caso haja algum problema de validação, lança uma exceção para
+	 * tratamento pelo método posterior.
 	 *
 	 * @param cerveja
 	 * @param prato
 	 * @return boolean
+	 * @throws Exception
 	 */
-	public boolean incluirHarmonizacao(Cerveja cerveja, Prato prato) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
-		int verificarHarmo = 0;
+
+	@SuppressWarnings("unchecked")
+	public boolean verificarHarmonizacao(Cerveja cerveja, Prato prato) throws Exception {
+
+		Criteria criteria = null;
 
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			verificarHarmo = verificarHarmonizacao(cerveja, prato);
-			if (verificarHarmo == -1) {
-				// Harmonizacao nao existe - criar nova harmonizacao
-				sttm = connection.prepareStatement("insert into harmonizacao (id_harmo, id_cerv, id_prato, media) "
-						+ "values (seqharmo.nextval,?,?,0)");
-				sttm.setInt(1, cerveja.getId_cerv());
-				sttm.setInt(2, prato.getId_prato());
-
-				sttm.executeUpdate();
-				return true;
-			} else if (verificarHarmo == -2) {
-				// Erro de banco
-				System.out.println("Harmonizacao nao incluida por inconsistência com o banco");
-				return false;
-			} else {
-				// Harmonizacao ja existe, nao incluir nada
-				System.out.println("Harmonizacao nao incluida por ja existir no banco de dados");
-				return true;
-
+			ArrayList<Harmonizacao> harmoCerv = new ArrayList<Harmonizacao>();
+			criteria = this.session.createCriteria(Harmonizacao.class)
+					.createAlias("cerveja", "c")
+					.add(Restrictions.eq("c.id_cerv", cerveja.getId_cerv()));
+			harmoCerv = (ArrayList<Harmonizacao>) criteria.list();
+			for (Harmonizacao h : harmoCerv) {
+				if (h.getPrato().getId_prato() == prato.getId_prato()) {
+					return true;
+				}
 			}
+			return false;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException he) {
+			he.printStackTrace();
+			throw new Exception();
+
+		} catch (Exception e) {
+			e.printStackTrace();
+			throw new Exception();
+		}
+	}
+
+	/**
+	 * Metodo que inclui uma harmonizacao no banco de dados caso ela ja nao exista.
+	 *
+	 * @param cerveja
+	 * @param prato
+	 * @return boolean
+	 * @throws Exception
+	 */
+	@Override
+	public boolean incluirHarmonizacao(Cerveja cerveja, Prato prato) {
+		Transaction transaction = null;
+		Harmonizacao h = new Harmonizacao(cerveja, prato, 0);
+
+		try {
+			if (verificarHarmonizacao(cerveja, prato)) {
+				System.out.println("Harmonizacao já existente");
+				return true;
+			} else {
+				transaction = this.session.beginTransaction();
+				this.session.save(h);
+				this.session.flush();
+				transaction.commit();
+				return true;
+			}
+		} catch (Exception e) {
+
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
 			e.printStackTrace();
 			return false;
-
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 
 	}
@@ -170,259 +116,140 @@ public class HarmonizacaoDAO {
 	 * @param harmo
 	 * @return boolean
 	 */
+	@SuppressWarnings("unchecked")
+	@Override
 	public boolean calcularMedia(Harmonizacao harmo) {
-		int naval = 0;
 		int nota = 0;
 		int qtdnota = 0;
 		double media = 0.0;
-		Connection connection = null;
-		PreparedStatement sttm = null;
-		ResultSet rs = null;
+		Criteria criteria = null;
+		Transaction transaction = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select nota from avaliacao where id_harmo =?");
-			sttm.setInt(1, harmo.getId_harmo());
-			rs = sttm.executeQuery();
-			while (rs.next()) {
-				naval = rs.getInt("nota");
-				nota = nota + naval;
+			ArrayList<Avaliacao> listaAval = new ArrayList<Avaliacao>();
+			criteria = this.session.createCriteria(Avaliacao.class)
+					.createAlias("harmonizacao", "h")
+					.add(Restrictions.eq("h.id_harmo", harmo.getId_harmo()));
+			listaAval = (ArrayList<Avaliacao>) criteria.list();
+			for (Avaliacao a : listaAval) {
+				nota = nota + a.getNota();
 				qtdnota = qtdnota + 1;
 			}
-			try {
+			if (qtdnota == 0) {
+				media = 0;
+			} else {
 				media = (double) nota / qtdnota;
-				if (qtdnota==0){
-					media=0;
-				}
-			} catch (ArithmeticException e) {
-				e.printStackTrace();
-				System.out.println("Ainda nao foram feitas avaliacoes para essa harmonizacao");
-				return false;
 			}
 
-			sttm.close();
-			sttm = connection.prepareStatement("Update harmonizacao set media=? where id_harmo=?");
-			sttm.setDouble(1, media);
-			sttm.setInt(2, harmo.getId_harmo());
-			sttm.executeUpdate();
+			harmo.setMedia(media);
+			transaction = this.session.beginTransaction();
+			this.session.merge(harmo);
+			this.session.flush();
+			transaction.commit();
 			return true;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (ArithmeticException ae) {
+			ae.printStackTrace();
+			System.out.println("Divisão por zero...");
+			return false;
+		} catch (HibernateException he) {
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
+			he.printStackTrace();
+			return false;
+
+		} catch (Exception e) {
 			e.printStackTrace();
 			return false;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
-
 	}
 
 	/**
-	 * Metodo para gerar um ranking em um ArrayList das melhores harmonizacoes
-	 * para determinada cerveja.
+	 * Metodo para gerar um ranking em um ArrayList das melhores harmonizacoes para
+	 * determinada cerveja.
 	 *
 	 * @param cerveja
-	 * @return ArrayList<Harmonizacao> em ordem decrescente das harmonizacoes
-	 *         pela media
+	 * @return ArrayList<Harmonizacao> em ordem decrescente das harmonizacoes pela
+	 *         media
 	 */
-	public ArrayList<Harmonizacao> gerarRanking(Cerveja cerveja) {
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Harmonizacao> gerarRanking(Cerveja cerveja) throws Exception {
 		ArrayList<Harmonizacao> listaHarmo = new ArrayList<Harmonizacao>();
-		Connection connection = null;
-		PreparedStatement sttm = null;
+		Criteria criteria;
 
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select p.id_prato, p.nm_prato, c.nm_cerv, h.id_harmo, h.media"
-					+ " from harmonizacao h left join prato p on p.id_prato = h.id_prato"
-					+ " left join cerveja c on c.id_cerv = h.id_cerv"
-					+ " where c.id_cerv=?"
-					+ " order by media desc");
-			sttm.setInt(1, cerveja.getId_cerv());
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_harmo = rs.getInt("id_harmo");
-				int id_prato = rs.getInt("id_prato");				
-				String pNm_cerv = rs.getString("nm_cerv");
-				String pNm_prato = rs.getString("nm_prato");
-				Double media = rs.getDouble("media");
-
-				Harmonizacao harmo = new Harmonizacao(id_harmo, cerveja.getId_cerv(), pNm_cerv, id_prato, pNm_prato, media);
-
-				listaHarmo.add(harmo);
-			}
-
+			criteria = this.session.createCriteria(Harmonizacao.class)
+					.createAlias("cerveja", "c")
+					.add(Restrictions.eq("c.id_cerv", cerveja.getId_cerv()))
+					.addOrder(Order.desc("media"));
+			listaHarmo = (ArrayList<Harmonizacao>) criteria.list();
 			return listaHarmo;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
 	}
 
 	/**
-	 * Metodo para gerar um ranking em um ArrayList das melhores harmonizacoes
-	 * para determinado prato.
+	 * Metodo para gerar um ranking em um ArrayList das melhores harmonizacoes para
+	 * determinado prato.
 	 *
 	 * @param cerveja
-	 * @return ArrayList<Harmonizacao> em ordem decrescente das harmonizacoes
-	 *         pela media
+	 * @return ArrayList<Harmonizacao> em ordem decrescente das harmonizacoes pela
+	 *         media
 	 */
-	public ArrayList<Harmonizacao> gerarRanking(Prato prato) {
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Harmonizacao> gerarRanking(Prato prato) throws Exception {
 		ArrayList<Harmonizacao> listaHarmo = new ArrayList<Harmonizacao>();
-		Connection connection = null;
-		PreparedStatement sttm = null;
+		Criteria criteria;
 
-		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select p.nm_prato, c.id_cerv, c.nm_cerv, h.id_harmo, h.media"
-					+ " from harmonizacao h left join prato p on p.id_prato = h.id_prato "
-					+ " left join cerveja c on c.id_cerv = h.id_cerv"
-					+ " where p.id_prato = ?"
-					+ " order by media desc");
-			sttm.setInt(1, prato.getId_prato());
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_harmo = rs.getInt("id_harmo");
-				int id_cerv = rs.getInt("id_cerv");
-				String pNm_cerv = rs.getString("nm_cerv");
-				String pNm_prato = rs.getString("nm_prato");
-				Double media = rs.getDouble("media");
-
-				Harmonizacao harmo = new Harmonizacao(id_harmo, id_cerv, pNm_cerv, prato.getId_prato(), pNm_prato, media);
-
-				listaHarmo.add(harmo);
-			}
-
+		try {			
+			criteria = this.session.createCriteria(Harmonizacao.class)
+					.createAlias("prato","p")
+					.add(Restrictions.eq("p.id_prato", prato.getId_prato())).addOrder(Order.desc("media"));
+			listaHarmo = (ArrayList<Harmonizacao>) criteria.list();
 			return listaHarmo;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
 	}
 
 	/**
-	 * Mï¿½todo que devolve a id de uma harmonizaï¿½ï¿½o com base na cerveja e
-	 * no prato
+	 * Mï¿½todo que devolve a id de uma harmonizaï¿½ï¿½o com base na cerveja e no
+	 * prato
 	 *
 	 * @param cerveja
 	 * @param prato
 	 * @return int id_harmo
 	 */
-	public int selecionaridHarmonizacao(Cerveja cerveja, Prato prato) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
-		ResultSet rs = null;
-		boolean verificarCerveja = false;
-		boolean verificarPrato = false;
-		int idHarmo = -1;
+	@Override
+	public int selecionaridHarmonizacao(Cerveja cerveja, Prato prato) throws Exception {
+		Criteria criteria = null;
+
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select p.id_prato, c.id_cerv, h.id_harmo from harmonizacao h "
-					+ "left join prato p on p.id_prato = h.id_prato "
-					+ "left join cerveja c on c.id_cerv = h.id_cerv");
-			rs = sttm.executeQuery();
-			while (rs.next()) {
-				verificarPrato = false;
-				verificarCerveja = false;
-				if (rs.getInt("id_prato") == prato.getId_prato()) {
-					verificarPrato = true;
-				} else {
-					verificarPrato = false;
-				}
-				if (rs.getInt("id_cerv") == cerveja.getId_cerv()) {
-					verificarCerveja = true;
-				} else {
-					verificarCerveja = false;
-				}
-				if (verificarPrato == true && verificarCerveja == true) {
-					idHarmo = rs.getInt("id_harmo");
-					return idHarmo;
-				}
+			if (verificarHarmonizacao(cerveja, prato)) {
+				criteria = this.session.createCriteria(Harmonizacao.class)
+						.createAlias("cerveja", "c")
+						.createAlias("prato", "p")
+						.add(Restrictions.eq("c.id_cerv", cerveja.getId_cerv()))
+						.add(Restrictions.eq("p.id_prato", prato.getId_prato()));
+				Harmonizacao h = (Harmonizacao) criteria.uniqueResult();
+				return h.getId_harmo();
+			} else {
+				System.out.println("Harmonização não existe ou não foi localizada na verificação");
+				throw new Exception();
 			}
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (Exception e) {
 			e.printStackTrace();
-			return -2;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return -2;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-				return -2;
-			}
+			throw new Exception();
 		}
-		return idHarmo;
+
 	}
 
 	/**
@@ -431,113 +258,60 @@ public class HarmonizacaoDAO {
 	 * @param id_harmo
 	 * @return objeto harmonizacao
 	 */
-	public Harmonizacao selecionarHarmo(int id_harmo) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
+	@Override
+	public Harmonizacao selecionarHarmo(int id_harmo) throws Exception {
 		Harmonizacao harmo = new Harmonizacao();
+		Criteria criteria = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select * from harmonizacao where id_harmo = ?");
-			sttm.setInt(1, id_harmo);
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_cerv = rs.getInt("id_cerv");
-				int id_prato = rs.getInt("id_prato");
-				Double media = rs.getDouble("media");
-				harmo = new Harmonizacao(id_harmo, id_cerv, id_prato, media);
-				harmo.setId_cerv(id_cerv);
-				harmo.setId_harmo(id_harmo);
-				harmo.setId_prato(id_prato);
-				harmo.setMedia(media);
-
-			}
-
+			criteria = this.session.createCriteria(Harmonizacao.class).add(Restrictions.eq("id_harmo", id_harmo));
+			harmo = (Harmonizacao) criteria.uniqueResult();
 			return harmo;
-
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException he) {
+			he.printStackTrace();
+			throw new Exception();
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
 	}
 
 	/**
-	 * Metodo que devolve uma ArrayList com toda as harmonizacoes cadastradas.
+	 * Metodo que devolve uma ArrayList com toda as harmonizacoes cadastradas, em ordem de médias das avaliações
 	 * 
 	 * @return ArrayList com todas as harmonizacoes
 	 */
-	public ArrayList<Harmonizacao> listarTodos() {
+	@SuppressWarnings("unchecked")
+	@Override
+	public ArrayList<Harmonizacao> listarTodos() throws Exception {
 		ArrayList<Harmonizacao> listaHarmo = new ArrayList<Harmonizacao>();
-		Connection connection = null;
-		PreparedStatement sttm = null;
-
+		Criteria criteria = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select p.id_prato, p.nm_prato, c.id_cerv, c.nm_cerv, h.id_harmo, h.media"
-					+ " from harmonizacao h left join prato p on p.id_prato = h.id_prato"
-					+ " left join cerveja c on c.id_cerv = h.id_cerv"
-					+ " order by media desc");
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_harmo = rs.getInt("id_harmo");
-				int id_prato = rs.getInt("id_prato");
-				int id_cerv = rs.getInt("id_cerv");
-				String pNm_cerv = rs.getString("nm_cerv");
-				String pNm_prato = rs.getString("nm_prato");
-				Double media = rs.getDouble("media");
-
-				Harmonizacao harmo = new Harmonizacao(id_harmo, id_cerv, pNm_cerv, id_prato, pNm_prato, media);
-
-				listaHarmo.add(harmo);
-			}
-
+			criteria = this.session.createCriteria(Harmonizacao.class).
+					addOrder(Order.desc("media"));
+			listaHarmo=(ArrayList<Harmonizacao>) criteria.list();
 			return listaHarmo;
-
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException he) {
+			he.printStackTrace();
+			throw new Exception();
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
+
 		}
+	}
+	
+	/**
+	 * @return the session
+	 */
+	public Session getSession() {
+		return session;
+	}
+
+	/**
+	 * @param session the session to set
+	 */
+	public void setSession(Session session) {
+		this.session = session;
 	}
 
 }

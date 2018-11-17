@@ -1,11 +1,11 @@
-
+package com.harmobeer.mvc.view;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
-import javax.enterprise.context.SessionScoped;
 import javax.faces.model.SelectItem;
+import javax.faces.view.ViewScoped;
 import javax.inject.Named;
 
 import com.harmobeer.mvc.controller.AvaliacaoController;
@@ -29,7 +29,7 @@ import com.harmobeer.vo.Usuario;
  *
  */
 @Named(value = "harmonizacaoBean")
-@SessionScoped
+@ViewScoped
 public class HarmonizacaoBean implements Serializable {
 
 	private static final long serialVersionUID = 1L;
@@ -159,7 +159,7 @@ public class HarmonizacaoBean implements Serializable {
 	 */
 	public void selecionarCerv() {
 		try {
-			setCervejaSelecionada(cervejaController.selecionarCerveja(idCervejaSelecionada));
+			setCervejaSelecionada(cervejaController.selecionarCerv(idCervejaSelecionada));
 			setNm_cerv(cervejaSelecionada.getNm_cerv());
 			setEstilo_cerv(cervejaSelecionada.getNm_estilo());
 			setTeor_alcoolico(cervejaSelecionada.getTeor_alcool());
@@ -229,7 +229,7 @@ public class HarmonizacaoBean implements Serializable {
 			ArrayList<Harmonizacao> ranking10 = new ArrayList<Harmonizacao>();
 
 			rankingTodos = harmonizacaoController
-					.gerarRanking(cervejaController.selecionarCerveja(idCervejaSelecionada));
+					.gerarRanking(cervejaController.selecionarCerv(idCervejaSelecionada));
 			setRankingCervejaTotal(rankingTodos);
 
 			if (rankingTodos.size() == 0) {
@@ -256,10 +256,10 @@ public class HarmonizacaoBean implements Serializable {
 	 * Cadastra a avaliação de um usuário logado.
 	 */
 	public void cadastrarAval() {
-		try {
-			Avaliacao aval = new Avaliacao(nota, comentario);
+		try {			
 			usuarioLogado = (Usuario) Util.getSessionParameter("userLog");
-			avaliacaoController.incluirAvaliacao(aval, usuarioLogado, harmonizacaoSelecionada);
+			Avaliacao aval = new Avaliacao (getHarmonizacaoSelecionada(), getUsuarioLogado(),getNota(), getComentario());
+			avaliacaoController.incluirAvaliacao(aval);
 			harmonizacaoController.calcularMedia(harmonizacaoSelecionada);
 			setMedia(harmonizacaoSelecionada.getMedia());
 			Util.mensagemInfo("Avaliação submetida com sucesso!");
@@ -285,11 +285,11 @@ public class HarmonizacaoBean implements Serializable {
 			List<Avaliacao> aval = new ArrayList<Avaliacao>();
 			List<Avaliacao> listaCompleta = new ArrayList<Avaliacao>();
 			int idHarmo = harmonizacaoController.selecionaridHarmonizacao(cervejaSelecionada, pratoSelecionado);
+			Harmonizacao h =harmonizacaoController.selecionarHarmo(idHarmo);
 			aval = avaliacaoController.listarAvalporHarmo(idHarmo);
 			for (Avaliacao a : aval) {
-				Usuario u = usuarioController.selecionarUser(a.getId_user());
-				Avaliacao avaliacao = new Avaliacao(a.getId_aval(), u.getId_user(), u.getUsername(), a.getNota(),
-						a.getComentario());
+				Usuario u = usuarioController.selecionarUser(a.getUser().getId_user());
+				Avaliacao avaliacao = new Avaliacao(a.getId_aval(), h, u , a.getNota(), a.getComentario());
 				listaCompleta.add(avaliacao);
 			}
 			setListaAval(listaCompleta);

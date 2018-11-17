@@ -3,16 +3,48 @@
  */
 package com.harmobeer.vo;
 
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 /**
  * Classe que modela o objeto Prato
  * 
  * @author Jose Carlos Soares da Cruz Junior 
  */
-public class Prato {
 
+@Entity
+@Table(name = "Prato")
+public class Prato implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence_generator")
+	@SequenceGenerator(name = "sequence_generator", sequenceName = "seqprato")
+	@Column(name = "id_prato")
 	private int id_prato;
+	
+	@Column(name = "nm_prato")
 	private String nm_prato;
+	
+	@OneToMany(mappedBy="prato", targetEntity=Harmonizacao.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)	
+	private List<Harmonizacao> harmonizacoes;
 
+
+	public Prato() {
+		
+	}
 
 	/**
 	 * Construtor da classe prato passando o id como parametro. Utilizado para
@@ -85,6 +117,23 @@ public class Prato {
 	public void setNm_prato(String nm_prato) {
 		this.nm_prato = nm_prato;
 	}
+
+	/**
+	 * @return the harmonizacoes
+	 */	
+	public List<Harmonizacao> getHarmonizacoes() {
+		return harmonizacoes;
+	}
+
+	/**
+	 * @param harmonizacoes the harmonizacoes to set
+	 */
+		
+	public void setHarmonizacoes(List<Harmonizacao> harmonizacoes) {
+		this.harmonizacoes = harmonizacoes;
+	}
+
+	
 
 
 }

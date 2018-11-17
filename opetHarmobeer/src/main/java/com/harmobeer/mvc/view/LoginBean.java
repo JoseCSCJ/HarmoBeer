@@ -1,3 +1,5 @@
+package com.harmobeer.mvc.view;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -8,15 +10,11 @@ import javax.faces.context.FacesContext;
 import javax.inject.Named;
 
 import com.harmobeer.mvc.controller.AvaliacaoController;
-import com.harmobeer.mvc.controller.CervejaController;
 import com.harmobeer.mvc.controller.HarmonizacaoController;
-import com.harmobeer.mvc.controller.PratoController;
 import com.harmobeer.mvc.controller.UsuarioController;
 import com.harmobeer.util.Util;
 import com.harmobeer.vo.Avaliacao;
-import com.harmobeer.vo.Cerveja;
 import com.harmobeer.vo.Harmonizacao;
-import com.harmobeer.vo.Prato;
 import com.harmobeer.vo.Usuario;
 
 /**
@@ -36,8 +34,6 @@ public class LoginBean implements Serializable {
 
 	private Usuario usuarioLogado;
 
-	private CervejaController cervejaController;
-	private PratoController pratoController;
 	private UsuarioController usuarioController;
 	private AvaliacaoController avaliacaoController;
 	private HarmonizacaoController harmonizacaoController;
@@ -50,15 +46,13 @@ public class LoginBean implements Serializable {
 	private String email;
 	private boolean privilegio;
 
-	private boolean renderizarUserLog;	
+	private boolean renderizarUserLog;
 
 	private List<Avaliacao> listaAval = new ArrayList<Avaliacao>();
 	private Avaliacao avalSelec;
 
 	public LoginBean() {
 		usuarioLogado = new Usuario();
-		cervejaController = new CervejaController();
-		pratoController = new PratoController();
 		usuarioController = new UsuarioController();
 		avaliacaoController = new AvaliacaoController();
 		harmonizacaoController = new HarmonizacaoController();
@@ -177,27 +171,26 @@ public class LoginBean implements Serializable {
 			}
 		}
 
-		catch (	Exception e) {
+		catch (Exception e) {
 			Util.mensagemErro("Não foi alterar sua senha.");
 			e.printStackTrace();
 		}
 
 	}
-	
+	/**
+	 * Método responsável por listar as avaliações de determinado usuário, guardando as informações para acesso na tela.
+	 */
+
 	public void listarAval() {
 		try {
 			ArrayList<Avaliacao> listaProv = new ArrayList<Avaliacao>();
 
 			for (Avaliacao a : avaliacaoController.listarAvalporUser(getId_user())) {
-				Harmonizacao h = harmonizacaoController.selecionarHarmo(a.getId_harmo());
-				Prato p = pratoController.selecionarPrato(h.getId_prato());
-				Cerveja c = cervejaController.selecionarCerveja(h.getId_cerv());
-				Avaliacao aval = new Avaliacao(a.getId_aval(), a.getId_harmo(), c.getNm_cerv(), p.getNm_prato(),
-						getId_user(), getUsername(), a.getNota(), a.getComentario());				
+				Harmonizacao h = harmonizacaoController.selecionarHarmo(a.getHarmonizacao().getId_harmo());
+				Avaliacao aval = new Avaliacao(a.getId_aval(), h, getUsuarioLogado(), a.getNota(), a.getComentario());
 				listaProv.add(aval);
 			}
-			
-			
+
 			setListaAval(listaProv);
 
 		} catch (Exception e) {
@@ -206,6 +199,9 @@ public class LoginBean implements Serializable {
 		}
 	}
 
+	/**
+	 * Método para deletar uma avaliação.
+	 */
 	public void removerAval() {
 		try {
 			if (avaliacaoController.deletarAvaliacao(getAvalSelec())) {
@@ -219,6 +215,17 @@ public class LoginBean implements Serializable {
 			e.printStackTrace();
 
 		}
+
+	}
+
+	/**
+	 * Método para atualizar o histórico antes do usuário acessar a página.
+	 * 
+	 * @return
+	 */
+	public String atualizarLista() {
+		listarAval();
+		return "/usuario/histAval.xhtml";
 
 	}
 

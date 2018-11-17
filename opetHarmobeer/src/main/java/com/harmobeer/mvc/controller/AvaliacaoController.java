@@ -5,10 +5,10 @@ package com.harmobeer.mvc.controller;
 
 import java.util.List;
 
+import com.harmobeer.interfaces.IAvaliacaoDAO;
 import com.harmobeer.mvc.model.AvaliacaoModel;
 import com.harmobeer.vo.Avaliacao;
-import com.harmobeer.vo.Harmonizacao;
-import com.harmobeer.vo.Usuario;
+
 
 /**
  * Classe responsavel pelo controller para o objeto Avaliacao
@@ -16,7 +16,7 @@ import com.harmobeer.vo.Usuario;
  * @author Jose Carlos Soares da Cruz Junior
  *
  */
-public class AvaliacaoController {
+public class AvaliacaoController implements IAvaliacaoDAO {
 	private AvaliacaoModel avaliacaoModel;
 
 	public AvaliacaoController() {
@@ -34,9 +34,9 @@ public class AvaliacaoController {
 	 * @return boolean
 	 * @throws Exception 
 	 */
-	public boolean incluirAvaliacao(Avaliacao aval, Usuario user, Harmonizacao harmo) throws Exception {
+	public boolean incluirAvaliacao(Avaliacao aval) {
 		if (validarAvaliacao(aval)) {
-			return avaliacaoModel.incluirAvaliacao(aval, user, harmo);
+			return avaliacaoModel.incluirAvaliacao(aval);
 		} else {
 			return false;
 		}
@@ -49,7 +49,7 @@ public class AvaliacaoController {
 	 * @return boolean
 	 * @throws Exception 
 	 */
-	public boolean editarAvaliacao(Avaliacao aval) throws Exception {
+	public boolean editarAvaliacao(Avaliacao aval) {
 		if (validarAvaliacao(aval)) {
 			return avaliacaoModel.editarAvaliacao(aval);
 		} else {
@@ -72,7 +72,7 @@ public class AvaliacaoController {
 	 * @param idUser
 	 * @return List<Avaliacao>
 	 */
-		public List<Avaliacao> listarAvalporUser(int idUser) {
+		public List<Avaliacao> listarAvalporUser(int idUser) throws Exception{
 			return avaliacaoModel.listarAvalporUser(idUser);
 
 		}
@@ -82,7 +82,7 @@ public class AvaliacaoController {
 		 * @param idUser
 		 * @return List<Avaliacao>
 		 */
-		public List<Avaliacao> listarAvalporHarmo(int idHarmo) {
+		public List<Avaliacao> listarAvalporHarmo(int idHarmo) throws Exception{
 			return avaliacaoModel.listarAvalporHarmo(idHarmo);
 			}
 		
@@ -94,7 +94,7 @@ public class AvaliacaoController {
 		 *            ID da avaliacao cadastrada no banco
 		 * @return Avaliacao selecionada
 		 */
-		public Avaliacao selecionarAval(int id) {
+		public Avaliacao selecionarAval(int id) throws Exception{
 			return avaliacaoModel.selecionarAval(id);
 		}
 		/**
@@ -103,7 +103,7 @@ public class AvaliacaoController {
 		 *
 		 * @return int id Ultima Avaliacao criada
 		 */
-		public int selecionarUltAval() {
+		public Avaliacao selecionarUltAval() throws Exception{
 			return avaliacaoModel.selecionarUltAval();
 		}
 
@@ -115,20 +115,20 @@ public class AvaliacaoController {
 	 * @return
 	 * @throws Exception 
 	 */
-	private boolean validarAvaliacao(Avaliacao aval) throws Exception {
+	private boolean validarAvaliacao(Avaliacao aval) {
 
 		int nota = aval.getNota();
 		String comentario = aval.getComentario();
 
 		if (comentario.length() > 140) {
 			System.out.println("Comentario muito longo");
-			throw new Exception();
+			return false;
 			
 		}
 
 		if (nota > 10 || nota < 1) {
 			System.out.println("Nota Inválida");
-			throw new Exception();			
+			return false;	
 		}
 
 		return true;

@@ -20,7 +20,9 @@ public interface ICervejaDAO {
 	
 	public boolean deletar(Cerveja cerveja);
 	
-	public List <Cerveja> listarTodos();
+	public List <Cerveja> listarTodos() throws Exception;
+	
+	public Cerveja selecionarCerv(int id) throws Exception;
 
-	public List<Cerveja> buscarCerv(String busca);
+	
 }

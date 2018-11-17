@@ -1,8 +1,11 @@
+package com.harmobeer.mvc.view;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
+
 import javax.faces.model.SelectItem;
 import javax.faces.view.ViewScoped;
 import javax.inject.Named;
@@ -160,7 +163,7 @@ public class AdminBean implements Serializable {
 
 	public void selecionarCerv() {
 		try {
-			setCervSelec(cervejaController.selecionarCerveja(getIdCervSelec()));
+			setCervSelec(cervejaController.selecionarCerv(getIdCervSelec()));
 			setNm_cervSelec(getCervSelec().getNm_cerv());
 			setEstilo_cervSelec(getCervSelec().getNm_estilo());
 			setTeorSelec(getCervSelec().getTeor_alcool());
@@ -314,15 +317,15 @@ public class AdminBean implements Serializable {
 			ArrayList<Avaliacao> listaProv = new ArrayList<Avaliacao>();
 
 			for (Avaliacao a : avaliacaoController.listarAvalporUser(getIdUserSelec())) {
-				Harmonizacao h = harmonizacaoController.selecionarHarmo(a.getId_harmo());
-				Prato p = pratoController.selecionarPrato(h.getId_prato());
-				Cerveja c = cervejaController.selecionarCerveja(h.getId_cerv());
-				Avaliacao aval = new Avaliacao(a.getId_aval(), a.getId_harmo(), c.getNm_cerv(), p.getNm_prato(),
-						getIdUserSelec(), getUsername(), a.getNota(), a.getComentario());				
+				Harmonizacao h = harmonizacaoController.selecionarHarmo(a.getHarmonizacao().getId_harmo());
+				Prato p = pratoController.selecionarPrato(h.getPrato().getId_prato());
+				Cerveja c = cervejaController.selecionarCerv(h.getCerveja().getId_cerv());
+				Usuario u = usuarioController.selecionarUser(getIdUserSelec());
+				h.setCerveja(c);
+				h.setPrato(p);
+				Avaliacao aval = new Avaliacao(a.getId_aval(), h, u, a.getNota(), a.getComentario());
 				listaProv.add(aval);
 			}
-			
-			
 			setListaAval(listaProv);
 
 		} catch (Exception e) {

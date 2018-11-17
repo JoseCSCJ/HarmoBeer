@@ -86,10 +86,11 @@ public class PratoController implements IPratoDAO {
 	 * 
 	 * @return ArrayList com os objetos da Classe Prato gerados com os dados
 	 *         recebidos do banco de dados.
+	 * @throws Exception 
 	 * 
 	 */
 	@Override
-	public List<Prato> listarTodos() {
+	public List<Prato> listarTodos() throws Exception {
 		return pratoModel.listarTodos();
 	}
 
@@ -100,8 +101,9 @@ public class PratoController implements IPratoDAO {
 	 * @param id
 	 *            ID da prato cadastrada no banco
 	 * @return Prato selecionada
+	 * @throws Exception 
 	 */
-	public Prato selecionarPrato(int id) {
+	public Prato selecionarPrato(int id) throws Exception {
 		return pratoModel.selecionarPrato(id);
 	}
 
@@ -126,16 +128,5 @@ public class PratoController implements IPratoDAO {
 
 	}
 
-	/**
-	 * Metodo responsavel por buscar e retornar uma lista de pratos que contem
-	 * uma string pre-determinada.
-	 *
-	 * @param String
-	 *            busca
-	 * @return List<Prato> com pratos que contem busca
-	 */
-	@Override
-	public List<Prato> buscarPrato(String busca) {
-		return pratoModel.buscarPrato(busca);
-	}
+	
 }

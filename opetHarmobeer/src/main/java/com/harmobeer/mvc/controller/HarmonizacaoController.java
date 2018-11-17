@@ -5,6 +5,7 @@ package com.harmobeer.mvc.controller;
 
 import java.util.ArrayList;
 
+import com.harmobeer.interfaces.IHarmonizacaoDAO;
 import com.harmobeer.mvc.model.HarmonizacaoModel;
 import com.harmobeer.vo.Cerveja;
 import com.harmobeer.vo.Harmonizacao;
@@ -17,7 +18,7 @@ import com.harmobeer.vo.Prato;
  * @author Jose Carlos Soares da Cruz Junior 
  *
  */
-public class HarmonizacaoController {
+public class HarmonizacaoController implements IHarmonizacaoDAO{
 	private HarmonizacaoModel harmonizacaoModel;
 
 	/**
@@ -58,7 +59,7 @@ public class HarmonizacaoController {
 	 * @return ArrayList<Harmonizacao> em ordem decrescente das harmonizacoes
 	 *         pela media
 	 */
-	public ArrayList<Harmonizacao> gerarRanking(Cerveja cerveja) {
+	public ArrayList<Harmonizacao> gerarRanking(Cerveja cerveja) throws Exception {
 		return harmonizacaoModel.gerarRanking(cerveja);
 	}
 
@@ -70,7 +71,7 @@ public class HarmonizacaoController {
 	 * @return ArrayList<Harmonizacao> em ordem decrescente das harmonizacoes
 	 *         pela media
 	 */
-	public ArrayList<Harmonizacao> gerarRanking(Prato prato) {
+	public ArrayList<Harmonizacao> gerarRanking(Prato prato) throws Exception{
 		return harmonizacaoModel.gerarRanking(prato);
 	}
 	/**
@@ -79,7 +80,7 @@ public class HarmonizacaoController {
 	 * @param prato
 	 * @return int id_harmo
 	 */
-	public int selecionaridHarmonizacao(Cerveja cerveja, Prato prato) {
+	public int selecionaridHarmonizacao(Cerveja cerveja, Prato prato) throws Exception{
 		return harmonizacaoModel.selecionaridHarmonizacao(cerveja, prato);
 	}
 	/**
@@ -87,14 +88,14 @@ public class HarmonizacaoController {
 	 * @param id_harmo
 	 * @return objeto harmonizacao 
 	 */
-	public Harmonizacao selecionarHarmo(int id_harmo) {
+	public Harmonizacao selecionarHarmo(int id_harmo) throws Exception{
 		return harmonizacaoModel.selecionarHarmo(id_harmo);
 	}
 	/**
 	 * Metodo que devolve uma ArrayList com toda as harmonizacoes cadastradas.
 	 * @return ArrayList com todas as harmonizacoes
 	 */
-	public ArrayList<Harmonizacao> listarTodos() {
+	public ArrayList<Harmonizacao> listarTodos() throws Exception {
 		return harmonizacaoModel.listarTodos();
 	}
 }

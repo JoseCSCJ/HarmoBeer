@@ -5,8 +5,9 @@ package com.harmobeer.mvc.model;
 
 import java.util.List;
 
-import com.harmobeer.db.dao.PratoDAO;
+import com.harmobeer.db.dao.PratoService;
 import com.harmobeer.interfaces.IPratoDAO;
+import com.harmobeer.util.ServiceFactory;
 import com.harmobeer.vo.Prato;
 
 /**
@@ -15,20 +16,20 @@ import com.harmobeer.vo.Prato;
  * @author Jose Carlos Soares da Cruz Junior 
  * 
  */
-public class PratoModel implements IPratoDAO {
-
-	private PratoDAO pratoDAO;
+public class PratoModel implements IPratoDAO{
+	
+	private PratoService pratoService;
 
 	/**
 	 * Construtor da classe Prato Model, utilizando a criacaSo de um novo objeto
-	 * da classe PratoDAO.
+	 * da classe PratoService.
 	 */
 	public PratoModel() {
-		pratoDAO = new PratoDAO();
+		this.pratoService = ServiceFactory.getInstancePratoService();
 	}
 
 	/**
-	 * Metodo que inclui um prato no banco, utilizando o objeto pratoDAO para
+	 * Metodo que inclui um prato no banco, utilizando o objeto pratoService para
 	 * acessar o banco
 	 * 
 	 * @param Prato
@@ -39,11 +40,11 @@ public class PratoModel implements IPratoDAO {
 	 */
 	@Override
 	public boolean incluir(Prato prato) {
-		return pratoDAO.incluir(prato);
+		return pratoService.incluir(prato);
 	}
 
 	/**
-	 * Metodo que edita uma prato no banco, utilizando o objeto pratoDAO para
+	 * Metodo que edita uma prato no banco, utilizando o objeto pratoService para
 	 * acessar o banco
 	 * 
 	 * @param Prato
@@ -54,11 +55,11 @@ public class PratoModel implements IPratoDAO {
 
 	@Override
 	public boolean editar(Prato prato) {
-		return pratoDAO.editar(prato);
+		return pratoService.editar(prato);
 	}
 
 	/**
-	 * Metodo que exclui uma prato no banco, utilizando o objeto pratoDAO para
+	 * Metodo que exclui uma prato no banco, utilizando o objeto pratoService para
 	 * acessar o banco
 	 * 
 	 * @param Prato
@@ -69,7 +70,7 @@ public class PratoModel implements IPratoDAO {
 
 	@Override
 	public boolean deletar(Prato prato) {
-		return pratoDAO.deletar(prato);
+		return pratoService.deletar(prato);
 	}
 
 	/**
@@ -78,12 +79,13 @@ public class PratoModel implements IPratoDAO {
 	 * 
 	 * @return ArrayList com os objetos da Classe Prato gerados com os dados
 	 *         recebidos do banco de dados.
+	 * @throws Exception 
 	 * 
 	 */
 
 	@Override
-	public List<Prato> listarTodos() {
-		return pratoDAO.listarTodos();
+	public List<Prato> listarTodos() throws Exception {
+		return pratoService.listarTodos();
 	}
 
 	/**
@@ -93,23 +95,14 @@ public class PratoModel implements IPratoDAO {
 	 * @param id
 	 *            ID do prato cadastrado no banco
 	 * @return Prato selecionado
+	 * @throws Exception 
 	 */
 
-	public Prato selecionarPrato(int id) {
-		return pratoDAO.selecionarPrato(id);
+	public Prato selecionarPrato(int id) throws Exception {
+		return pratoService.selecionarPrato(id);
 	}
 
-	/**
-	 * Metodo responsavel por buscar e retornar uma lista de pratos que contem
-	 * uma string pre-determinada.
-	 *
-	 * @param String
-	 *            busca
-	 * @return List<Prato> com pratos que contem busca
-	 */
-	@Override
-	public List<Prato> buscarPrato(String busca) {
-		return pratoDAO.buscarPrato(busca);
-	}
+	
+	
 
 }

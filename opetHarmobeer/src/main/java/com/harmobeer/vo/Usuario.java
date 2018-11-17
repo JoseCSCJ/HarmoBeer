@@ -3,20 +3,55 @@
  */
 package com.harmobeer.vo;
 
+import java.io.Serializable;
+import java.util.List;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
+import javax.persistence.SequenceGenerator;
+import javax.persistence.Table;
+
 /**
  * Classe que modela o objeto Usuario
  *
  * @author Jos� Carlos Soares da Cruz Junior 
  */
-public class Usuario {
 
+@Entity
+@Table(name = "Usuario")
+public class Usuario implements Serializable {
+	
+	private static final long serialVersionUID = 1L;
+	
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO, generator = "sequence_generator")
+	@SequenceGenerator(name = "sequence_generator", sequenceName = "sequsuario")
+	@Column(name = "id_user")
 	private int id_user;
+	
+	@Column (name = "username")
 	private String username;
+	
+	@Column (name = "email")
 	private String email;
+	
+	@Column (name = "senha")
 	private String senha;
+	
+	@Column (name = "privilegio")
 	private int privilegio;
+	
+	@Column (name = "info")
 	private String info;
-
+	
+	@OneToMany(mappedBy="user", targetEntity=Avaliacao.class, fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+	private List<Avaliacao> avaliacoes;
 
 	public Usuario() {
 
@@ -188,6 +223,18 @@ public class Usuario {
 	 */
 	public void setInfo(String info) {
 		this.info = info;
+	}
+	/**
+	 * @return the avaliacoes
+	 */
+	public List<Avaliacao> getAvaliacoes() {
+		return avaliacoes;
+	}
+	/**
+	 * @param avaliacoes the avaliacoes to set
+	 */
+	public void setAvaliacoes(List<Avaliacao> avaliacoes) {
+		this.avaliacoes = avaliacoes;
 	}
 
 }

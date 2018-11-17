@@ -10,7 +10,7 @@ import com.harmobeer.vo.Prato;
 /**
  * Interface responsavel pelos DAO's da classe Prato
  * 
- * @author Jose Carlos Soares da Cruz Junior 
+ * @author Jose Carlos Soares da Cruz Junior
  *
  */
 public interface IPratoDAO {
@@ -20,7 +20,8 @@ public interface IPratoDAO {
 
 	public boolean deletar(Prato prato);
 
-	public List<Prato> listarTodos();
+	public List<Prato> listarTodos() throws Exception;
 
-	public List<Prato> buscarPrato(String busca);
+	public Prato selecionarPrato(int id) throws Exception;
+
 }

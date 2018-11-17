@@ -26,7 +26,7 @@
 						rendered="#{loginBean.renderizarUserLog == true}">
 						<p:menuitem value="Editar perfil"
 							action="/usuario/editarCadastro.xhtml" />
-						<p:menuitem value="Histórico de avaliações" url="#" />
+						<p:menuitem value="Histórico de avaliações" action="/usuario/histAval.xhtml" />
 					</p:submenu>
 
 					<p:submenu label="Harmonização">
@@ -38,7 +38,7 @@
 
 
 					<p:menuitem value="Painel de Administração"
-						rendered="#{loginBean.privilegio == true}" />
+						rendered="#{loginBean.privilegio == true}" action="/harmobeer/painelAdmin.xhtml"/>
 
 					<p:menuitem value="Sobre nós" action="/harmobeer/sobreNos.xhtml" />
 
@@ -92,8 +92,9 @@
 									</p:column>
 									<p:column>
 										<p:inputText id="email" value="#{loginBean.email}"
-											maxlenght="50">
+											maxlenght="50" validatorMessage="#{loginBean.email} não é uma opção válida">
 											<f:validateLength minimum="1" maximum="50" />
+											<f:validateRegex pattern="([^.@]+)(\.[^.@]+)*@([^.@]+\.)+([^.@]+)" />
 										</p:inputText>
 
 										<p:message for="email" closable="true" />
@@ -126,7 +127,7 @@
 					</p:column>
 					<p:column>
 						<h:form id="altsenha">
-						<p:messages closable="true" />
+							<p:messages closable="true" />
 							<p:panelGrid>
 								<p:row>
 									<p:column>
@@ -177,6 +178,7 @@
 					</p:column>
 				</p:panelGrid>
 			</div>
+		
 		</ui:define>
 	</ui:composition>
 

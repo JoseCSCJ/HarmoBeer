@@ -3,6 +3,7 @@
  */
 package com.harmobeer.interfaces;
 
+
 import java.util.List;
 
 import com.harmobeer.vo.Usuario;
@@ -20,9 +21,11 @@ public interface IUsuarioDAO {
 
 	public boolean deletar(Usuario usuario);
 
-	public List<Usuario> buscarUser(String busca);
-
-	public Usuario logar (String username, String senha);
+	public Usuario logar (String username, String senha) throws Exception;
 
 	public boolean verificarPrivilegio(Usuario usuario);
+	
+	public Usuario selecionarUser(int id_user) throws Exception;
+	
+	public List<Usuario> listarTodos() throws Exception;
 }

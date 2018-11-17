@@ -115,7 +115,7 @@
 						value="#{harmonizacaoBean.rankingCerveja}">
 
 						<p:column style="width:80%" headerText="Prato">
-							<h:outputText value="#{harmonizacao.nm_prato}" />
+							<h:outputText value="#{harmonizacao.prato.nm_prato}" />
 						</p:column>
 
 						<p:column headerText="Média">
@@ -138,7 +138,7 @@
 
 
 						<p:column style="width:80%" headerText="Cerveja">
-							<h:outputText value="#{harmonizacao.nm_cerv}" />
+							<h:outputText value="#{harmonizacao.cerveja.nm_cerv}" />
 						</p:column>
 
 						<p:column headerText="Média">
@@ -195,7 +195,7 @@
 									<p:row>
 										<p:column colspan="2">
 											<p:commandButton action="#{harmonizacaoBean.cadastrarAval()}"
-												value="Submeter Avaliação" update="aval avaliacoes ranking"
+												value="Submeter Avaliação" update="aval avaliacoes ranking harmo"
 												align="center" />
 										</p:column>
 									</p:row>
@@ -220,7 +220,7 @@
 							<p:panelGrid style="width:100%; margin:3px">
 								<f:facet name="header">
 									<p:column colspan="2">
-										<h:outputText value="Avaliação de #{avaliacao.username}" />
+										<h:outputText value="Avaliação de #{avaliacao.user.username}" />
 									</p:column>
 								</f:facet>
 								<p:row>

@@ -21,15 +21,15 @@
 					style="margin:20px" align="center">
 
 					<f:facet name="header">        
-							Avaliacoes feitas por você
+							Avaliações feitas por você
 						</f:facet>
 					<p:panelGrid>
 						<p:row>
 							<p:column headerText="Cerveja">
-								<h:outputText value="#{avaliacao.nm_cerv}"></h:outputText>
+								<h:outputText value="#{avaliacao.harmonizacao.cerveja.nm_cerv}"></h:outputText>
 							</p:column>
 							<p:column headerText="Prato">
-								<h:outputText value="#{avaliacao.nm_prato}"></h:outputText>
+								<h:outputText value="#{avaliacao.harmonizacao.prato.nm_prato}"></h:outputText>
 							</p:column>
 							<p:column headerText="Nota">
 								<h:outputText value="#{avaliacao.nota}"></h:outputText>

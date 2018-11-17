@@ -3,13 +3,15 @@
  */
 package com.harmobeer.db.dao;
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
+
+import org.hibernate.Criteria;
+import org.hibernate.HibernateException;
+import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 
 import com.harmobeer.interfaces.IUsuarioDAO;
 import com.harmobeer.vo.Usuario;
@@ -17,14 +19,15 @@ import com.harmobeer.vo.Usuario;
 /**
  * Classe responsavel pelo acesso ao banco de dados para Usuario
  *
- * @author Jose Carlos Soares da Cruz Junior 
+ * @author Jose Carlos Soares da Cruz Junior
  */
 public class UsuarioDAO implements IUsuarioDAO {
-	private static final String JDBC_DRIVER = "oracle.jdbc.driver.OracleDriver";
-	private static final String LOCAL_HOST = "jdbc:oracle:thin:@//localhost:1521/xe";
-	private static final String DB_USER = "harmobeer";
-	private static final String DB_PASSWORD = "harmobeer";
-	private static final String ERRO = "Nao foi possivel completar sua requisicao.";
+
+	private Session session;
+
+	public UsuarioDAO() {
+
+	}
 
 	/**
 	 * Inclui um usuario no banco de dados.
@@ -34,44 +37,38 @@ public class UsuarioDAO implements IUsuarioDAO {
 	 */
 	@Override
 	public boolean incluir(Usuario user) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
-
+		Transaction transaction = null;
+		Criteria criteria = null;
+		user.setPrivilegio(0);
 		try {
-			Class.forName(JDBC_DRIVER);
+			// verificar se já existe alguém com Username/email
+			criteria = this.session.createCriteria(Usuario.class).add(Restrictions.eq("username", user.getUsername()));
 
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
+			if (criteria.list() == null) {
+				System.out.println("Usuário com esse username já existe no sistema");
+				return false;
+			}
+			criteria = null;
+			criteria = this.session.createCriteria(Usuario.class).add(Restrictions.eq("email", user.getEmail()));
+			if (criteria.list() == null) {
+				System.out.println("Usuário com esse email já existe no sistema");
+				return false;
+			}
 
-			sttm = connection.prepareStatement(
-					"insert into usuario(id_user, username, email, senha, privilegio, info) values (sequsuario.nextval,?,?,?, 0,?)");
-			sttm.setString(1, user.getUsername());
-			sttm.setString(2, user.getEmail());
-			sttm.setString(3, user.getSenha());
-			sttm.setString(4, user.getInfo());
+			// adicionando no banco de dados
 
-			sttm.executeUpdate();
-
+			transaction = this.session.beginTransaction();
+			this.session.save(user);
+			this.session.flush();
+			transaction.commit();
 			return true;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
 			e.printStackTrace();
 			return false;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
@@ -84,209 +81,78 @@ public class UsuarioDAO implements IUsuarioDAO {
 	 */
 	@Override
 	public boolean editar(Usuario user) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
-
+		Transaction transaction = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection
-					.prepareStatement("UPDATE usuario set username=?, email=?, senha=?, info=? where id_user=?");
-
-			sttm.setString(1, user.getUsername());
-			sttm.setString(2, user.getEmail());
-			sttm.setString(3, user.getSenha());
-			sttm.setString(4, user.getInfo());
-			sttm.setInt(5, user.getId_user());
-
-			sttm.executeUpdate();
-
+			transaction = this.session.beginTransaction();
+			this.session.merge(user);
+			this.session.flush();
+			transaction.commit();
 			return true;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
 			e.printStackTrace();
 			return false;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
 	}
 
 	/**
-	 * Transforma um usuario em um usuario anonimo, mantendo as suas avaliacoes
-	 * e contribuicoes para a plataforma intactas.
+	 * Transforma um usuario em um usuario anonimo, mantendo as suas avaliacoes e
+	 * contribuicoes para a plataforma intactas.
 	 *
 	 * @param user
 	 * @return boolean
 	 */
 	@Override
 	public boolean deletar(Usuario user) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
+		Transaction transaction = null;
+		String nome = "Anonimo" + user.getId_user();
+		user.setUsername(nome);
+		user.setSenha(nome.toUpperCase());
+		user.setEmail(nome + "@harmobeer.com");
+		user.setInfo("Usuário banido por mal uso da plataforma");
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-			sttm = connection.prepareStatement(
-					"UPDATE usuario set username = 'Anonimo', email='anonimo@harmobeer.com', senha='anonimo', info='Anonimo' where id_user=?");
-			sttm.setInt(1, user.getId_user());
-			sttm.executeUpdate();
-			
+			transaction = this.session.beginTransaction();
+			this.session.update(user);
+			this.session.flush();
+			transaction.commit();
 			return true;
 
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
+			if (transaction.isActive()) {
+				transaction.rollback();
+			}
 			e.printStackTrace();
 			return false;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return false;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
 		}
-	}
-
-	/**
-	 * Metodo responsavel por buscar e retornar uma lista de usuariso que contem
-	 * uma string pre-determinada.
-	 *
-	 * @param String
-	 *            busca
-	 * @return List<Usuario> com usuarios que contem busca no username
-	 */
-	@Override
-	public List<Usuario> buscarUser(String busca) {
-		ArrayList<Usuario> listaUser = new ArrayList<Usuario>();
-		Connection connection = null;
-		PreparedStatement sttm = null;
-		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection
-					.prepareStatement("select * from usuario where regexp_like(username, '" + busca + "', 'i')");
-
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_user = rs.getInt("id_user");
-				String username = rs.getString("username");
-				String email = rs.getString("email");
-				String senha = rs.getString("senha");
-				int privilegio = rs.getInt("privilegio");
-				String info = rs.getString("info");
-				Usuario user = new Usuario(id_user, username, email, senha, privilegio, info);
-
-				listaUser.add(user);
-			}
-
-			return listaUser;
-
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
-			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
-		}
-
 	}
 
 	/**
 	 * Metodo responsavel por retornar um usuario cujas Strings para username e
 	 * senha tenham um match no banco de dados
 	 *
-	 * @param Usuario
-	 *            usuario
-	 * @return Usuario com username e senha correspondentes ou null se nao
-	 *         houver correspondente
+	 * @param Usuario usuario
+	 * @return Usuario com username e senha correspondentes ou null se nao houver
+	 *         correspondente
 	 */
 	@Override
-	public Usuario logar(String username, String senha) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
+	public Usuario logar(String username, String senha) throws Exception {
+
 		Usuario user = null;
+		Criteria criteria = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select id_user, email, privilegio, info from usuario where username ='"
-					+ username + "' and senha='" + senha + "' ");
-
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_user = rs.getInt("id_user");
-				String email = rs.getString("email");
-				int privilegio = rs.getInt("privilegio");
-				String info = rs.getString("info");
-				user = new Usuario(id_user, username, email, senha, privilegio, info);
-
+			criteria = this.session.createCriteria(Usuario.class).add(Restrictions.eq("username", username))
+					.add(Restrictions.eq("senha", senha));
+			user = (Usuario) criteria.uniqueResult();
+			if (user == null) {
+				System.out.println("Busca não retornou resultados");				
 			}
-
 			return user;
-
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
 
 	}
@@ -312,112 +178,61 @@ public class UsuarioDAO implements IUsuarioDAO {
 	 * @param id_user
 	 * @return
 	 */
-	public Usuario selecionarUser(int id_user) {
-		Connection connection = null;
-		PreparedStatement sttm = null;
-		Usuario user = null;
+	public Usuario selecionarUser(int id_user) throws Exception {
+		Criteria criteria = null;
+		Usuario user = new Usuario();
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select * from usuario where id_user = ?");
-
-			sttm.setInt(1, id_user);
-
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				String username = rs.getString("username");
-				String senha = rs.getString("senha");
-				String email = rs.getString("email");
-				int privilegio = rs.getInt("privilegio");
-				String info = rs.getString("info");
-				user = new Usuario(id_user, username, email, senha, privilegio, info);
-
-			}
-
+			criteria = this.session.createCriteria(Usuario.class).add(Restrictions.eq("id_user", id_user));
+			user = (Usuario) criteria.uniqueResult();
 			return user;
-
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException he) {
+			he.printStackTrace();
+			System.out.println("Possivelmente não trouxe resultado único na seleção de usuário");
+			throw new Exception();
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
 	}
 
 	/**
-	 * Metodo responsavel por realizar a listagem de todos os Usuarios
-	 * cadastradas no banco.
+	 * Metodo responsavel por realizar a listagem de todos os Usuarios cadastradas
+	 * no banco.
 	 *
 	 * @return ArrayList com os objetos da Classe Usuario gerados com os dados
 	 *         recebidos do banco de dados.
 	 *
 	 */
 
-	public List<Usuario> listarTodos() {
+	@SuppressWarnings("unchecked")
+	public List<Usuario> listarTodos() throws Exception {
 		ArrayList<Usuario> listaUsuario = new ArrayList<Usuario>();
-		Connection connection = null;
-		PreparedStatement sttm = null;
+		Criteria criteria = null;
 		try {
-			Class.forName(JDBC_DRIVER);
-
-			connection = DriverManager.getConnection(LOCAL_HOST, DB_USER, DB_PASSWORD);
-
-			sttm = connection.prepareStatement("select * from usuario");
-			ResultSet rs = sttm.executeQuery();
-
-			while (rs.next()) {
-
-				int id_user = rs.getInt("id_user");
-				String username = rs.getString("username");
-				String senha = rs.getString("senha");
-				String email = rs.getString("email");
-				int privilegio = rs.getInt("privilegio");
-				String info = rs.getString("info");
-				Usuario user = new Usuario(id_user, username, email, senha, privilegio, info);
-				listaUsuario.add(user);
-			}
-
+			criteria = this.session.createCriteria(Usuario.class).addOrder(Order.desc("username"));
+			listaUsuario = (ArrayList<Usuario>) criteria.list();
 			return listaUsuario;
-
-		} catch (ClassNotFoundException e) {
-			System.out.println(ERRO);
+		} catch (HibernateException he) {
+			he.printStackTrace();
+			throw new Exception();
+		} catch (Exception e) {
 			e.printStackTrace();
-			return null;
-		} catch (SQLException Except) {
-			System.out.println(ERRO);
-			Except.printStackTrace();
-			return null;
-		} finally {
-			try {
-				if (connection != null) {
-					connection.close();
-				}
-				if (sttm != null) {
-					sttm.close();
-				}
-			} catch (SQLException e) {
-				e.printStackTrace();
-			}
+			throw new Exception();
 		}
 
 	}
 
+	/**
+	 * @return the session
+	 */
+	public Session getSession() {
+		return session;
+	}
+
+	/**
+	 * @param session the session to set
+	 */
+	public void setSession(Session session) {
+		this.session = session;
+	}
 }
