@@ -48,9 +48,10 @@ public class PainelInicialBean implements Serializable {
 	public PainelInicialBean() {
 
 		harmonizacaoController = new HarmonizacaoController();
-		avaliacaoController = new AvaliacaoController();
+		avaliacaoController = new AvaliacaoController();		
 		ultAvaliacao();
-		retornarRankingGeral();
+		retornarRankingGeral();		
+		
 
 	}
 
@@ -94,6 +95,21 @@ public class PainelInicialBean implements Serializable {
 				rankingGeral.add(rankingPrev.get(i));
 			}
 			setRankingGeral(rankingGeral);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+	
+	public void calcularMedias() {
+		try {		
+
+			ArrayList<Harmonizacao> h = new ArrayList<Harmonizacao>();
+			h = harmonizacaoController.listarTodos();
+			System.out.println("O tamanho do array é...   " + h.size());
+			for (int i = 0; i < h.size(); i++) {
+				harmonizacaoController.calcularMedia(h.get(i));
+				
+			}			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

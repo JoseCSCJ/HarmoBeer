@@ -3,6 +3,8 @@
  */
 package com.harmobeer.db.dao;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.util.ArrayList;
 
 import org.hibernate.Criteria;
@@ -138,6 +140,12 @@ public class HarmonizacaoDAO implements IHarmonizacaoDAO {
 				media = 0;
 			} else {
 				media = (double) nota / qtdnota;
+				DecimalFormatSymbols otherSymbols = new DecimalFormatSymbols();
+				otherSymbols.setDecimalSeparator('.');
+				otherSymbols.setGroupingSeparator(','); 
+				DecimalFormat df = new DecimalFormat("#0.00", otherSymbols);				
+				System.out.println("A média formatada ficou " + df.format(media));
+				media = Double.parseDouble(df.format(media));
 			}
 
 			harmo.setMedia(media);
